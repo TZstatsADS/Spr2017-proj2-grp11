@@ -1,0 +1,183 @@
+---
+title: "3D Earth-1.0v"
+author: "Ruxue Peng, rp2815"
+date: "February 14, 2017"
+output: html_document
+---  
+#Step 0: Install Required packages  
+```{r,echo = F,message=F}
+#before everything, first set your working directory to the data folder
+packages.used <- 
+  c("geosphere", # For spatial methods  
+    "threejs",   # threejs is used for 3-D interactive Earth Visualization
+    "rworldmap", # For creating earth map
+    "leaflet",   # Leaflet for R provides functions to control and integrate Leaflet, a JavaScript library for interactive maps, within R.
+    "rgeos",      # Provides functions for handling operations on topologies.
+    "raster",     # For raster image
+    "DT",         # For creating interactive tables
+    "ggplot2",
+    "sp"   ,       # For Spatial processing of data
+    "ggmap",       # To reverse geocode Long/Lat
+    "knitr",        # TO enable 3-D visualization embedding in the HTML page
+    "rglwidget",
+    "rgl",
+    "plyr",
+    "reshape2"
+    )
+#
+# check packages that need to be installed.
+packages.needed=setdiff(packages.used, 
+                        intersect(installed.packages()[,1], 
+                                  packages.used))
+# install additional packages
+if(length(packages.needed)>0){
+  install.packages(packages.needed, dependencies = TRUE)
+}
+
+#load the packages
+library("plyr")
+library("reshape2")
+library("geosphere")
+library("threejs")
+library("rworldmap")
+library("leaflet")
+library("rgeos")
+library("raster")
+library("DT")
+library("ggplot2")
+library("sp")
+library("ggmap")
+library("knitr")
+library("rglwidget")
+library("rgl")
+source("../lib/Match_flora.R")
+source("../lib/plot_3D.R")
+
+#
+# Set this property to enable 3-D visualization
+#
+knit_hooks$set(webgl = hook_webgl)
+```  
+
+#Step 1: loading geocoded csv from data folder  
+
+```{r}
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+input_data =  read.csv("import_long_lat.csv",header = T,as.is = T)
+names(input_data) <- c("Year","Country","export value",
+                       "import value","longitude","latitude")
+input_data=input_data[,1:6]
+datatable(input_data,rownames = F)
+#Can search for different countries' data
+```  
+
+#Step 2: subset the data we want- for shiny's input
+
+```{r preparation for shiny input}
+input_data = melt(input_data,id.vars = c("Year","Country","longitude","latitude"),
+                  variable.name = "type")
+year = 1996
+type = "import value"
+input_data = input_data[input_data$Year == year & input_data$type == type,]
+num_of_arc = 100
+input_data = input_data[order(input_data$value,decreasing = T),]
+input_data = input_data[1:num_of_arc,]
+```
+
+
+#Step 3: Converting data to Spatial Format
+```{r Spatial Format}
+# Converting Data to spatial objects
+source_df<-data.frame(SourceLong=input_data$longitude,SourceLat=input_data$latitude)
+# Create object of class SpatialPoints using SpatialPoints function from sp package
+source_sp<-SpatialPoints(source_df, proj4string=CRS("+proj=longlat"))
+str(source_sp)
+head(source_sp)
+
+# Convert to Spatial Dataframe
+source_spdf <- SpatialPointsDataFrame(source_sp, data = source_df)
+str(source_spdf)
+head(source_spdf)
+
+# Similarly for the Destination Locations-US
+C <- unlist(c(geocode("United States")[1],geocode("United States")[2]))
+US <- data.frame(US_longitude= rep(C[1],length(input_data$`Country`)),
+                US_latitude = rep(C[2]),length(input_data$`Country`))[,1:2]
+# Converting Data to spatial objects
+
+dest_df<-data.frame(DestLong=US$US_longitude,DestLat=US$US_latitude)
+#
+# Create object of class SpatialPoints using SpatialPoints function from sp package
+#
+dest_sp<-SpatialPoints(dest_df, proj4string=CRS("+proj=longlat"))
+#
+# Convert to Spatial Dataframe
+#
+dest_spdf <- SpatialPointsDataFrame(dest_sp, data = dest_df)
+```  
+
+
+#Step 4: Calculate the distance and bearing between import country and US  
+*Bearing: A bearing is the angular difference away from a north or south baseline, ranging from 0° to 90°. Determining your bearing begins with a north or south baseline, whichever is closer to your direction. The angle is then measured east or west from the baseline.
+```{r}
+#using the  distHaversine and bearing functions from geosphere package
+#Create a Combined data frame for display purpose only
+comb_df<-cbind(input_data,To = rep("US",length(input_data$`Country`)),US)
+
+# Calculate distance between Source and Destination
+comb_df$distance<-distHaversine(source_sp,dest_sp)
+comb_df$bearing<-bearing(dest_sp,source_sp)
+
+# Display the combined dataframe using interactive table 
+datatable(comb_df, rownames = FALSE)
+```  
+
+#Step 5: try a 2D map
+
+```{r}
+if(FALSE){ 
+(worldMap <- getMap())
+world.points <- fortify(worldMap)  # Convert data into dataframe using fortify from ggplot2
+head(world.points)
+#
+world.points$region <- world.points$id
+#
+world.df <- world.points[,c("long","lat","group", "region")]
+#
+worldmap <- ggplot() + 
+  geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+  geom_point(aes(x=comb_df[,3], y=comb_df[,4]),color="yellow", size=1) +  # Plot Source Locations
+  geom_point(aes(x=comb_df[,8], y=comb_df[,9]),color="cornflowerblue", size=10) +  # Plot Dest Location
+  scale_y_continuous(breaks = (-2:2) * 30) +
+  scale_x_continuous(breaks = (-4:4) * 45) +
+  theme_bw() +
+  theme(axis.line = element_line(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())
+#
+worldmap
+}
+```  
+
+#Step 6: Try the static 3D map
+
+```{r}
+if(FALSE){ 
+worldmap +coord_map("ortho", 
+   orientation=c(40, -40,-10))+
+  theme(panel.background = element_rect(fill = 'gray', colour = 'white'), panel.grid.major = element_line(color = "white"),
+    panel.grid.minor = element_line(color = "white"))
+}
+```
+
+#Step 7: Interactive 3D globe  
+
+```{r 3D globe}
+comb_df$`value` = comb_df$`value`+1
+comb_df$log = log(comb_df$`value`) * 0.1
+# 3-D visual
+#for detailed code, refer to plot_3D.R in lib folder
+globe_3D(comb_df)
+```
