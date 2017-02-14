@@ -6,7 +6,7 @@ output: html_document
 ---  
 #Step 0: Install Required packages  
 ```{r,echo = F}
-#set your working directory into the project folder and inside the lib library
+#set your working directory into the project folder and inside the data library
 setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
 packages.used <- 
   c("geosphere", # For spatial methods  
@@ -21,7 +21,9 @@ packages.used <-
     "ggmap",       # To reverse geocode Long/Lat
     "knitr",        # TO enable 3-D visualization embedding in the HTML page
     "rglwidget",
-    "rgl"
+    "rgl",
+    "plyr",
+    "reshape2"
     )
 #
 # check packages that need to be installed.
@@ -34,6 +36,8 @@ if(length(packages.needed)>0){
 }
 
 #load the packages
+library("plyr")
+library("reshape2")
 library("geosphere")
 library("threejs")
 library("rworldmap")
@@ -106,9 +110,10 @@ datatable(input_data,rownames = F)
 #Step 3: subset the data we want- for shiny's input
 
 ```{r preparation for shiny input}
+input_data = melt(input_data,id.vars = c("Year","Country","longitude","latitude"),variable.name = "type")
 year = 1996
 type = "import value"
-input_data = input_data[input_data$Year == year,]
+input_data = input_data[input_data$Year == year & input_data$type == type,]
 ```
 
 
@@ -132,8 +137,8 @@ head(source_spdf)
 ```{r US long and lat}
 # Similarly for the Destination Locations-US
 C <- unlist(c(geocode("United States")[1],geocode("United States")[2]))
-US <- data.frame(US_longitude= rep(C[1],length(input_data$`Imported From`)),
-                US_latitude = rep(C[2]),length(input_data$`Imported From`))[,1:2]
+US <- data.frame(US_longitude= rep(C[1],length(input_data$`Country`)),
+                US_latitude = rep(C[2]),length(input_data$`Country`))[,1:2]
 # Converting Data to spatial objects
 
 dest_df<-data.frame(DestLong=US$US_longitude,DestLat=US$US_latitude)
@@ -153,7 +158,7 @@ head(dest_spdf)
 ```{r}
 #using the  distHaversine and bearing functions from geosphere package
 #Create a Combined data frame for display purpose only
-comb_df<-cbind(input_data,To = rep("US",length(input_data$`Imported From`)),US)
+comb_df<-cbind(input_data,To = rep("US",length(input_data$`Country`)),US)
 
 # Calculate distance between Source and Destination
 comb_df$distance<-distHaversine(source_sp,dest_sp)
@@ -168,7 +173,7 @@ datatable(comb_df, rownames = FALSE)
 #
 # Plot source points
 #
-plot(comb_df[5:6],col= "red", pch = 3,xlab="",ylab="")
+plot(comb_df[3:4],col= "red", pch = 3,xlab="",ylab="")
 #
 # Add Destination points
 #
@@ -189,7 +194,7 @@ world.df <- world.points[,c("long","lat","group", "region")]
 #
 worldmap <- ggplot() + 
   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-  geom_point(aes(x=comb_df[,5], y=comb_df[,6]),color="yellow", size=1) +  # Plot Source Locations
+  geom_point(aes(x=comb_df[,3], y=comb_df[,4]),color="yellow", size=1) +  # Plot Source Locations
   geom_point(aes(x=comb_df[,8], y=comb_df[,9]),color="cornflowerblue", size=10) +  # Plot Dest Location
   scale_y_continuous(breaks = (-2:2) * 30) +
   scale_x_continuous(breaks = (-4:4) * 45) +
@@ -215,15 +220,15 @@ worldmap +coord_map("ortho",
 #Step 9: add inactivity  
 
 ```{r}
-comb_df$`import value` = comb_df$`import value`+1
-comb_df$log = log(comb_df$`import value`) * 0.1
+comb_df$`value` = comb_df$`value`+1
+comb_df$log = log(comb_df$`value`) * 0.1
 ```
 
 ```{r}
 (earth <- system.file("images/world.jpg",  package="threejs")) # Get the image of globe
 #
 # 3-D visual Dataframe
-globejs(img=earth, lat=comb_df[,6], long=comb_df[,5],value = 1,color = "yellow", arcs=comb_df[,c(6,5,9,8)],
+globejs(img=earth, lat=comb_df[,4], long=comb_df[,3],value = 1,color = "yellow", arcs=comb_df[,c(4,3,9,8)],
         arcsHeight=0.3, arcsLwd=comb_df$log, arcsColor="cornflowerblue", arcsOpacity=comb_df$log/max(comb_df$log)+0.5,
         atmosphere=TRUE, height=800, width = 800)
 ```
