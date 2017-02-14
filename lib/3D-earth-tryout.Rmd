@@ -1,0 +1,230 @@
+---
+title: "3D Earth-tryout1"
+author: "Ruxue Peng, rp2815"
+date: "February 14, 2017"
+output: html_document
+---  
+#Step 0: Install Required packages  
+```{r,echo = F}
+#set your working directory into the project folder and inside the lib library
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+packages.used <- 
+  c("geosphere", # For spatial methods  
+    "threejs",   # threejs is used for 3-D interactive Earth Visualization
+    "rworldmap", # For creating earth map
+    "leaflet",   # Leaflet for R provides functions to control and integrate Leaflet, a JavaScript library for interactive maps, within R.
+    "rgeos",      # Provides functions for handling operations on topologies.
+    "raster",     # For raster image
+    "DT",         # For creating interactive tables
+    "ggplot2",
+    "sp"   ,       # For Spatial processing of data
+    "ggmap",       # To reverse geocode Long/Lat
+    "knitr",        # TO enable 3-D visualization embedding in the HTML page
+    "rglwidget",
+    "rgl"
+    )
+#
+# check packages that need to be installed.
+packages.needed=setdiff(packages.used, 
+                        intersect(installed.packages()[,1], 
+                                  packages.used))
+# install additional packages
+if(length(packages.needed)>0){
+  install.packages(packages.needed, dependencies = TRUE)
+}
+
+#load the packages
+library("geosphere")
+library("threejs")
+library("rworldmap")
+library("leaflet")
+library("rgeos")
+library("raster")
+library("DT")
+library("ggplot2")
+library("sp")
+library("ggmap")
+library("knitr")
+library("rglwidget")
+library("rgl")
+source("../lib/Match_flora.R")
+#
+# Set this property to enable 3-D visualization
+#
+knit_hooks$set(webgl = hook_webgl)
+```  
+
+#Step 1: (First-time-only)Data Cleaning  
+*skip if you have import_long_lat.csv in your data folder.  
+
+```{r Data Cleaning}
+# Read the file
+if(FALSE){ 
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+input_data<-read.csv("data(cleaned).csv", header = TRUE, stringsAsFactors = FALSE)
+str(input_data)
+#$ Year                       : int  1996 1996 1996 1996 1996 1996 1996 1996 1996 1996 ...
+# $ Country                    : chr  "Canada" "Mexico" "Guatemala" "Belize" ...
+# $ ExportsFASValueBasisYtdDec : int  532850043 56077722 1656512 350102 1114079 1226421 642139 2113706 4827307 1283338 ...
+# $ GenImportsCIFValBasisYtdDec: num  3.59e+08 6.32e+08 2.69e+08 1.33e+05 5.54e+07 ...
+}
+```  
+
+#Step 2: (First-time-only)geocode to generate longitude and latitude data  
+*skip if you have import_long_lat.csv in your data folder.  
+
+```{r Geocoding}
+#Make sure you have internet since geocode function uses google 
+#get the longitue and latitude for the 46 countries in the dataset
+if(FALSE){
+long_lat = matrix(NA,nrow = length(unique(input_data$Country)),ncol = 2)
+long_lat <- geocode(unique(input_data$Country))
+long_lat <- cbind(unique(input_data$Country),long_lat)
+names(long_lat) <- c("Country","Longitude","Latitude")
+#match the 227 countries with the 3616 import records 
+long.lat = apply(input_data,1,Match.flora)
+long.lat.matrix = matrix(long.lat,ncol = 2,byrow = T)
+input_data = cbind(input_data,long.lat.matrix)
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+write.csv(input_data,file = "import_long_lat.csv",row.names = F)
+}
+
+```  
+
+#Step 2: loading geocoded csv from data folder  
+
+```{r}
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+input_data =  read.csv("import_long_lat.csv",header = T,as.is = T)
+names(input_data) <- c("Year","Country","export value",
+                       "import value","longitude","latitude")
+input_data=input_data[,1:6]
+datatable(input_data,rownames = F)
+#Can search for different countries' data
+```  
+
+#Step 3: subset the data we want- for shiny's input
+
+```{r preparation for shiny input}
+year = 1996
+type = "import value"
+input_data = input_data[input_data$Year == year,]
+```
+
+
+#Step 4: Converting data to Spatial Format
+```{r Spatial Format}
+# Converting Data to spatial objects
+source_df<-data.frame(SourceLong=input_data$longitude,SourceLat=input_data$latitude)
+# Create object of class SpatialPoints using SpatialPoints function from sp package
+source_sp<-SpatialPoints(source_df, proj4string=CRS("+proj=longlat"))
+str(source_sp)
+head(source_sp)
+
+# Convert to Spatial Dataframe
+source_spdf <- SpatialPointsDataFrame(source_sp, data = source_df)
+str(source_spdf)
+head(source_spdf)
+```  
+
+
+
+```{r US long and lat}
+# Similarly for the Destination Locations-US
+C <- unlist(c(geocode("United States")[1],geocode("United States")[2]))
+US <- data.frame(US_longitude= rep(C[1],length(input_data$`Imported From`)),
+                US_latitude = rep(C[2]),length(input_data$`Imported From`))[,1:2]
+# Converting Data to spatial objects
+
+dest_df<-data.frame(DestLong=US$US_longitude,DestLat=US$US_latitude)
+#
+# Create object of class SpatialPoints using SpatialPoints function from sp package
+#
+dest_sp<-SpatialPoints(dest_df, proj4string=CRS("+proj=longlat"))
+#
+# Convert to Spatial Dataframe
+#
+dest_spdf <- SpatialPointsDataFrame(dest_sp, data = dest_df)
+head(dest_spdf)
+```  
+
+#Step 5: Calculate the distance and bearing between import country and US  
+*Bearing: A bearing is the angular difference away from a north or south baseline, ranging from 0° to 90°. Determining your bearing begins with a north or south baseline, whichever is closer to your direction. The angle is then measured east or west from the baseline.
+```{r}
+#using the  distHaversine and bearing functions from geosphere package
+#Create a Combined data frame for display purpose only
+comb_df<-cbind(input_data,To = rep("US",length(input_data$`Imported From`)),US)
+
+# Calculate distance between Source and Destination
+comb_df$distance<-distHaversine(source_sp,dest_sp)
+comb_df$bearing<-bearing(dest_sp,source_sp)
+
+# Display the combined dataframe using interactive table 
+datatable(comb_df, rownames = FALSE)
+```  
+
+#Step 6: 2D without the map
+```{r}
+#
+# Plot source points
+#
+plot(comb_df[5:6],col= "red", pch = 3,xlab="",ylab="")
+#
+# Add Destination points
+#
+points(comb_df[8:9],col="blue")
+
+```  
+
+#Step 7: with the map
+
+```{r}
+(worldMap <- getMap())
+world.points <- fortify(worldMap)  # Convert data into dataframe using fortify from ggplot2
+head(world.points)
+#
+world.points$region <- world.points$id
+#
+world.df <- world.points[,c("long","lat","group", "region")]
+#
+worldmap <- ggplot() + 
+  geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+  geom_point(aes(x=comb_df[,5], y=comb_df[,6]),color="yellow", size=1) +  # Plot Source Locations
+  geom_point(aes(x=comb_df[,8], y=comb_df[,9]),color="cornflowerblue", size=10) +  # Plot Dest Location
+  scale_y_continuous(breaks = (-2:2) * 30) +
+  scale_x_continuous(breaks = (-4:4) * 45) +
+  theme_bw() +
+  theme(axis.line = element_line(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank())
+#
+worldmap
+```  
+
+#Step 8: 3D map
+
+```{r}
+worldmap +coord_map("ortho", 
+   orientation=c(40, -40,-10))+
+  theme(panel.background = element_rect(fill = 'gray', colour = 'white'), panel.grid.major = element_line(color = "white"),
+    panel.grid.minor = element_line(color = "white"))
+```
+
+#Step 9: add inactivity  
+
+```{r}
+comb_df$`import value` = comb_df$`import value`+1
+comb_df$log = log(comb_df$`import value`) * 0.1
+```
+
+```{r}
+(earth <- system.file("images/world.jpg",  package="threejs")) # Get the image of globe
+#
+# 3-D visual Dataframe
+globejs(img=earth, lat=comb_df[,6], long=comb_df[,5],value = 1,color = "yellow", arcs=comb_df[,c(6,5,9,8)],
+        arcsHeight=0.3, arcsLwd=comb_df$log, arcsColor="cornflowerblue", arcsOpacity=comb_df$log/max(comb_df$log)+0.5,
+        atmosphere=TRUE, height=800, width = 800)
+```
+
