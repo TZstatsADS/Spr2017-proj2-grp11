@@ -1,9 +1,7 @@
 ---
-title: "3D Earth-1.0v"
-author: "Ruxue Peng, rp2815"
-date: "February 14, 2017"
-output: html_document
----  
+title: "R Notebook"
+output: html_notebook
+---
 #Step 0: Install Required packages  
 ```{r,echo = F,message=F}
 #before everything, first set your working directory to the data folder
@@ -62,12 +60,11 @@ knit_hooks$set(webgl = hook_webgl)
 #Step 1: loading geocoded csv from data folder  
 
 ```{r}
-setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
 input_data =  read.csv("import_long_lat.csv",header = T,as.is = T)
 names(input_data) <- c("Year","Country","export value",
                        "import value","longitude","latitude")
 input_data=input_data[,1:6]
-datatable(input_data,rownames = F)
+#datatable(input_data,rownames = F)
 #Can search for different countries' data
 ```  
 
@@ -128,66 +125,49 @@ comb_df<-cbind(input_data,To = rep("US",length(input_data$`Country`)),US)
 comb_df$distance<-distHaversine(source_sp,dest_sp)
 comb_df$bearing<-bearing(dest_sp,source_sp)
 
-# Display the combined dataframe using interactive table 
-datatable(comb_df, rownames = FALSE)
-```  
 
-#Step 5: try a 2D map
-
-```{r}
-if(FALSE){ 
-(worldMap <- getMap())
-world.points <- fortify(worldMap)  # Convert data into dataframe using fortify from ggplot2
-head(world.points)
-#
-world.points$region <- world.points$id
-#
-world.df <- world.points[,c("long","lat","group", "region")]
-#
-worldmap <- ggplot() + 
-  geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-  geom_point(aes(x=comb_df[,3], y=comb_df[,4]),color="yellow", size=1) +  # Plot Source Locations
-  geom_point(aes(x=comb_df[,8], y=comb_df[,9]),color="cornflowerblue", size=10) +  # Plot Dest Location
-  scale_y_continuous(breaks = (-2:2) * 30) +
-  scale_x_continuous(breaks = (-4:4) * 45) +
-  theme_bw() +
-  theme(axis.line = element_line(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_blank())
-#
-worldmap
-}
-```  
-
-#Step 6: Try the static 3D map
-
-```{r}
-if(FALSE){ 
-worldmap +coord_map("ortho", 
-   orientation=c(40, -40,-10))+
-  theme(panel.background = element_rect(fill = 'gray', colour = 'white'), panel.grid.major = element_line(color = "white"),
-    panel.grid.minor = element_line(color = "white"))
-}
 ```
 
-#Step 7: Interactive 3D globe  
-
-```{r 3D globe}
+```{r}
 comb_df$`value` = comb_df$`value`+1
 comb_df$log = log(comb_df$`value`) * 0.1
-# 3-D visual
-#for detailed code, refer to plot_3D.R in lib folder
-earth <- "../fig/worldmap.jpg"
-#globejs(img=earth, bg="white", emissive="#aaaacc")
-globejs(img=earth, bg="white", emissive="#aaaacc",
-          arcs=comb_df[,c(4,3,9,8)],
-          arcsHeight=0.4, 
-          arcsLwd=0.5, 
-          arcsColor="cornflowerblue", 
-          arcsOpacity=0.5,
-          atmosphere=TRUE, height=600, width = 600
-          )
+```  
+
+#Step 7: (plan B)
+
+```{r}
+library("maptools")
+data(wrld_simpl)                             # Basic country shapes
+load(url("http://illposed.net/bono.rdata"))  # Awareness index data
+
+bgcolor <- "#000025"
+earth <- tempfile(fileext=".jpg")
+jpeg(earth, width=2048, height=1024, quality=100, bg=bgcolor, antialias="default")
+par(mar = c(0,0,0,0),    pin = c(4,2),    pty = "m",    xaxs = "i",
+    xaxt = "n",          xpd = FALSE,    yaxs = "i",    yaxt = "n")
+
+map_palette <- apply(col2rgb(heat.colors(5)[5:1])/768,2,function(x)rgb(x[1],x[2],x[3]))
+# Restrict bono data to countries from the maptools package
+bono <- bono[rownames(bono) %in% wrld_simpl$NAME, ,drop=FALSE]
+# Set a default color for each country and the colors from the bono data
+clrs <- rep(map_palette[1], length(wrld_simpl$NAME))
+names(clrs) <- wrld_simpl$NAME
+clrs[rownames(bono)] <- map_palette[bono$index]
+
+plot(wrld_simpl,  col=clrs,   bg=bgcolor,        border="cyan",  ann=FALSE,
+     axes=FALSE,  xpd=FALSE,  xlim=c(-180,180), ylim=c(-90,90),  setParUsrBB=TRUE)
+
+graphics.off()
+
+legendcol=heat.colors(5)[5:1]
+globejs(img=earth, bg="white",
+        arcs=comb_df[,c(4,3,9,8)],
+        arcsHeight=0.4, 
+        arcsLwd=comb_df$log,
+        arcsColor="cornflowerblue", 
+        arcsOpacity=0.8,
+        atmosphere=TRUE, height=600, width = 600
+        )
 
 ```
+
