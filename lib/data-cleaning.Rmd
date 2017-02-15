@@ -1,0 +1,58 @@
+---
+title: "3D-v2"
+author: "Ruxue Peng, rp2815"
+date: "February 16, 2017"
+output: html_document
+---  
+```{r}  
+#load our data
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+input = read.csv("sitc3digit-year.csv",header=T, as.is = T)
+names(input)[3] = "Commodity_Name"
+input = melt(input,id.vars = c("Year","SITC","Commodity_Name","Country"),
+                  variable.name = "trade_type")
+unique(input$Commodity_Name)
+input$Commodity_Name[input$Commodity_Name == "COFFEE AND COFFEE SUBSTITUTES"] = "Coffee"
+input$Commodity_Name[input$Commodity_Name == "CHOCOLATE & OTHER FOOD PREPARATIONS CONTAINING CO"] = "Chocolate"
+input$Commodity_Name[input$Commodity_Name == "TEA AND MATE"] = "Tea"
+input$Commodity_Name[input$Commodity_Name == "SPICES"] = "Spices"
+unique(input$Commodity_Name)
+
+
+Aggregate = aggregate(input$value,by = list(input$Year,
+                                            input$Country,input$trade_type),FUN="sum")
+names(Aggregate) = c("Year","Country","trade_type","value")
+Aggregate = data.frame(Year = Aggregate$Year,SITC = 70,Commodity_Name = "Annual Aggregate",
+                       Country = Aggregate$Country,trade_type = Aggregate$trade_type,
+                       value = Aggregate$value)
+input = rbind(input,Aggregate)
+
+#load the longitude and latitude of the countries in the world
+library(maptools)
+data("wrld_simpl")
+long_lat = data.frame(Country = wrld_simpl$NAME,
+                      longitude = wrld_simpl$LON,
+                      latitude = wrld_simpl$LAT)
+#match the long and lat we want
+Match.flora <- function(input_data){
+  tmp = match(input_data[4],long_lat$Country)
+  return(as.matrix(c(long_lat$longitude[tmp],long_lat$latitude[tmp])))
+}
+long.lat = apply(input,1,Match.flora)
+long.lat.matrix = matrix(long.lat,ncol = 2,byrow = T)
+input = cbind(input,long.lat.matrix)
+names(input)[7:8] = c("longitude","latitude")
+#adding US and its longitude, latitude
+US = data.frame(To = rep("US",nrow(input)),US.longitude = -95.71289,US.latitude = 37.09024)
+input = cbind(input,US)
+mydata = data.frame(Year = input$Year,Country = input$Country,longitude = input$longitude,
+           latitude = input$latitude,type = input$trade_type,value = input$value,
+           To = input$To,US.longitude = input$US.longitude,US.latitude = input$US.latitude,
+           Commodity_Name = input$Commodity_Name)
+```
+
+```{r}
+#save the result for visualization
+write.csv(mydata,"../data/mydata.csv",row.names = F)
+```
+
