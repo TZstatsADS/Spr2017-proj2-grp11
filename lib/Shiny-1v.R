@@ -51,22 +51,25 @@ library("shiny")
 ## UI Function
 
 ui<- navbarPage(
-  "World love for hot drinks",
+  "Flowing in and Flowing out",
   tabPanel("3D Globe",
-  titlePanel("US commodity imports from across the globe"),
+  titlePanel("Coffee ,tea, and others traded between US and the world"),
   sidebarLayout(
     sidebarPanel(
-      sliderInput(inputId = "year_3D",
-                  label = "Select a year",
-                  value = 1996, min =1996, max =2016),
-      selectInput(inputId = "commodity_3D",
-                  label  = "Select the commodity",
-                  choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                  selected ='Coffee'),
       radioButtons(inputId = "type",
                    label  = "Choose import/export",
                    choices = c('Export','Import'),
-                   selected ='Export')
+                   selected ='Export'),
+      sliderInput(inputId = "year_3D",
+                  label = "Select a year",
+                  value = 1996, min =1996, max =2016),
+      sliderInput(inputId = "number_countries",
+                  label = "Top Countries in Trade",
+                  value = 10,min = 1,max = 50),
+      selectInput(inputId = "commodity_3D",
+                  label  = "Select the commodity",
+                  choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                  selected ='Coffee')
     ),
     mainPanel(
       globeOutput("Globe"))
@@ -117,6 +120,7 @@ server<- function(input, output){
     temp = subset(temp,Commodity_Name == as.character(input$commodity_3D))
     temp = subset(temp,Year == as.integer(input$year_3D))
     temp = subset(temp,type == as.character(input$type))
+    temp = arrange(temp,desc(value))[1:input$number_countries,]
     index = match(input$commodity_3D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
     ##### end subset
     
@@ -142,8 +146,8 @@ server<- function(input, output){
     ## Globe plotting
     globejs(earth, bg="white", emissive="#aaaacc",
             arcs=temp[,c(4,3,9,8)],
-            arcsHeight=0.2, 
-            arcsLwd=0.8, 
+            arcsHeight=0.25, 
+            arcsLwd=2, 
             arcsColor = arc_colors[index], 
             arcsOpacity=0.5,
             atmosphere=TRUE, height=600, width = 600
