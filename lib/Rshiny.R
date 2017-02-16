@@ -66,7 +66,10 @@ ui<- fluidPage(
       selectInput(inputId = "type",
                   label  = "Choose import/export",
                   choices = c('Export','Import'),
-                  selected ='Export')
+                  selected ='Export'),
+      sliderInput(inputId = "number_countries",
+                  label = "Top k countries",
+                  value = 10, min =1, max =50)
     ),
   mainPanel(
     globeOutput("Globe")
@@ -115,6 +118,7 @@ server<- function(input, output){
     temp = subset(temp,Commodity_Name == as.character(input$commodity_3D))
     temp = subset(temp,Year == as.integer(input$year_3D))
     temp = subset(temp,type == as.character(input$type))
+    temp = arrange(temp, desc(value))[1:input$number_countries,]
     index = match(input$commodity_3D,c('Annual Aggregate','Chocolate', 'Coffee','COCOA','Spices','Tea'))
     ##### end subset
     
@@ -127,24 +131,23 @@ server<- function(input, output){
     map_palette = map_pal[,index]
     clrs = rep('#050505', length(wrld_simpl$NAME))
     names(clrs) = wrld_simpl$NAME
-    clrs[input_data$Country] <- map_palette[input_data$log]
+    clrs[temp$Country] <- map_palette[temp$log]
     
     plot(wrld_simpl,  col=clrs,   bg=bgcolor,  border="#757575", cex = 0.1,  ann=FALSE,
          axes=FALSE,  xpd=FALSE,  xlim=c(-180,180), ylim=c(-90,90),  setParUsrBB=TRUE)
     
     graphics.off()
     
-    legendcol=heat.colors(5)[5:1]
     ##### end map creation
     
     ## Globe plotting
     globejs(earth, bg="white", emissive="#aaaacc",
             arcs=temp[,c(4,3,9,8)],
             arcsHeight=0.4, 
-            arcsLwd=0.5, 
+            arcsLwd=2, 
             arcsColor = arc_colors[index], 
             arcsOpacity=0.5,
-            atmosphere=TRUE, height=600, width = 600
+            atmosphere=FALSE, height=600, width = 600
     )
     ## end globe plotting
   })
