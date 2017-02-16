@@ -94,20 +94,26 @@ ui<- navbarPage(
 input_data =  read.csv("data/mydata.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
-input_data$log = trunc(log(input_data$value)/4)
+#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
+input_data$log = ceiling(log(input_data$value)/3)-2
 ## end preprocess data
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
 bgcolor = "#000000"
-arc_colors = c("#998080","#809980","#808099","#999980","#809999","#998099")
-map_pal = data.frame(AnnualAggregate = c(0,0,0,0,0),Chocolate = c(0,0,0,0,0), Coffee = c(0,0,0,0,0), Cocoa = c(0,0,0,0,0), Spices = c(0,0,0,0,0), Tea = c(0,0,0,0,0))
-map_pal$AnnualAggregate = c("#151010","#201515","#252020","#302525","#403535")
-map_pal$Chocolate = c("#101510","#152015","#202520","#253025","#354035")
-map_pal$Coffee = c("#101015","#151520","#202025","#252530","#353540")
-map_pal$Cocoa = c("#151510","#202015","#252520","#303025","#404035")
-map_pal$Spices = c("#101515","#152020","#202525","#253030","#354040")
-map_pal$Tea = c("#151015","#201520","#252025","#302530","#403540")
+arc_colors = c("#ffd3d3","#d3ffd3","#d3d3ff","#ffffd3","#d3ffff","#ffd3ff")
+map_pal = data.frame(AnnualAggregate = c(0,0,0,0,0,0),
+                     Chocolate = c(0,0,0,0,0,0), 
+                     Coffee = c(0,0,0,0,0,0), 
+                     Cocoa = c(0,0,0,0,0,0), 
+                     Spices = c(0,0,0,0,0,0), 
+                     Tea = c(0,0,0,0,0,0))
+map_pal$AnnualAggregate = c("#151010","#201515","#252020","#302525","#403535","#665d5d")
+map_pal$Chocolate = c("#101510","#152015","#202520","#253025","#354035","#5d665d")
+map_pal$Coffee = c("#101015","#151520","#202025","#252530","#353540","#5d5d66")
+map_pal$Cocoa = c("#151510","#202015","#252520","#303025","#404035","#66665d")
+map_pal$Spices = c("#101515","#152020","#202525","#253030","#354040","#5d6666")
+map_pal$Tea = c("#151015","#201520","#252025","#302530","#403540","#665d66")
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
 
@@ -144,12 +150,13 @@ server<- function(input, output){
     ##### end map creation
     
     ## Globe plotting
-    globejs(earth, bg="white", emissive="#aaaacc",
+    globejs(earth, bg="black", emissive="#aaaacc",
+            fov = 38,
             arcs=temp[,c(4,3,9,8)],
-            arcsHeight=0.25, 
+            arcsHeight=0.35, 
             arcsLwd=2, 
             arcsColor = arc_colors[index], 
-            arcsOpacity=0.5,
+            arcsOpacity=1,
             atmosphere=TRUE, height=600, width = 600
     )
     ## end globe plotting
