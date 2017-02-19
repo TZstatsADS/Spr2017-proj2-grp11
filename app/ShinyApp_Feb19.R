@@ -217,7 +217,7 @@ server<- function(input, output){
     clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     ##### end subset
     
-    g = ggplot(data = temp, aes(x = Country, y = value)) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country)
+    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
     g
     
   })
@@ -256,6 +256,7 @@ server<- function(input, output){
   
   ## MotionChart
   output$view <- renderGvis({
+    
     gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee', options=list(width="800", height="800"))
   })
   ## end MotionChart
