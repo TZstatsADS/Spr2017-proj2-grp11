@@ -1,3 +1,4 @@
+
 ## Packages
 
 packages.used <- 
@@ -17,7 +18,8 @@ packages.used <-
     "plyr",
     "reshape2",
     "maptools",
-    "shiny"
+    "shiny",
+    "googleVis"
   )
 
 # check packages that need to be installed.
@@ -47,79 +49,33 @@ library("rglwidget")
 library("rgl")
 library("maptools")
 library("shiny")
-
-## UI Function
-
-ui<- navbarPage(
-  "Flowing in and Flowing out",
-  tabPanel("3D Globe",
-  titlePanel("Coffee ,tea, and others traded between US and the world"),
-  sidebarLayout(
-    sidebarPanel(
-      radioButtons(inputId = "type",
-                   label  = "Choose import/export",
-                   choices = c('Export','Import'),
-                   selected ='Export'),
-      sliderInput(inputId = "year_3D",
-                  label = "Select a year",
-                  value = 1996, min =1996, max =2016),
-      sliderInput(inputId = "number_countries",
-                  label = "Top Countries in Trade",
-                  value = 10,min = 1,max = 50),
-      selectInput(inputId = "commodity_3D",
-                  label  = "Select the commodity",
-                  choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                  selected ='Coffee')
-    ),
-    mainPanel(
-      globeOutput("Globe"))
-  ),
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput(inputId = "year_linear_graph",
-                  label = "choose a year",
-                  value = 1996, min =1996, max =2016)),
-    mainPanel (
-      plotOutput("linear")
-    )
-  )
-),
-    navbarMenu("Summary Stastics",
-               tabPanel("Component A"),
-               tabPanel("Component B")),
-    tabPanel("More")
-)
+library("shinythemes")
+library("googleVis")
 
 ## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("data/mydata.csv",header = T,as.is = T)
+input_data =  read.csv("../../data/mydata.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
 #create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
 input_data$log = ceiling(log(input_data$value)/3)-2
+#Load the data for Google motion data
+country<-read.csv("../../data/country_cleaned.csv")
 ## end preprocess data
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
 bgcolor = "#000000"
-arc_colors = c("#ffd3d3","#d3ffd3","#d3d3ff","#ffffd3","#d3ffff","#ffd3ff")
-map_pal = data.frame(AnnualAggregate = c(0,0,0,0,0,0),
-                     Chocolate = c(0,0,0,0,0,0), 
-                     Coffee = c(0,0,0,0,0,0), 
-                     Cocoa = c(0,0,0,0,0,0), 
-                     Spices = c(0,0,0,0,0,0), 
-                     Tea = c(0,0,0,0,0,0))
-map_pal$AnnualAggregate = c("#151010","#201515","#252020","#302525","#403535","#665d5d")
-map_pal$Chocolate = c("#101510","#152015","#202520","#253025","#354035","#5d665d")
-map_pal$Coffee = c("#101015","#151520","#202025","#252530","#353540","#5d5d66")
-map_pal$Cocoa = c("#151510","#202015","#252520","#303025","#404035","#66665d")
-map_pal$Spices = c("#101515","#152020","#202525","#253030","#354040","#5d6666")
-map_pal$Tea = c("#151015","#201520","#252025","#302530","#403540","#665d66")
+arc_colors = c("#998080","#809980","#808099","#999980","#809999","#998099")
+map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
+
 
 ## Server function
 
 server<- function(input, output){
+  
+  ## 3D Globe
   output$Globe <- renderGlobe({
     ##### subset dataframe
     temp = input_data
@@ -128,6 +84,7 @@ server<- function(input, output){
     temp = subset(temp,type == as.character(input$type))
     temp = arrange(temp,desc(value))[1:input$number_countries,]
     index = match(input$commodity_3D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
+    maxValue = log(max(temp$value))
     ##### end subset
     
     ##### map colors creation
@@ -139,16 +96,15 @@ server<- function(input, output){
     map_palette = map_pal[,index]
     clrs = rep('#050505', length(wrld_simpl$NAME))
     names(clrs) = wrld_simpl$NAME
-    clrs[temp$Country] <- map_palette[temp$log]
+    clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     
     plot(wrld_simpl,  col=clrs,   bg=bgcolor,  border="#757575", cex = 0.1,  ann=FALSE,
          axes=FALSE,  xpd=FALSE,  xlim=c(-180,180), ylim=c(-90,90),  setParUsrBB=TRUE)
     
     graphics.off()
-    
     ##### end map creation
     
-    ## Globe plotting
+    ##### globe plotting
     globejs(earth, bg="black", emissive="#aaaacc",
             fov = 38,
             arcs=temp[,c(4,3,9,8)],
@@ -158,10 +114,70 @@ server<- function(input, output){
             arcsOpacity=1,
             atmosphere=TRUE, height=600, width = 600
     )
-    ## end globe plotting
   })
+  ## end 3D Globe
+  
+  
+  
+  ## ggplot
+  output$ggplot <- renderPlot({
+    
+    ##### subset dataframe
+    temp = input_data
+    temp = subset(temp,Commodity_Name == as.character(input$commodity_3D))
+    temp = subset(temp,Year == as.integer(input$year_3D))
+    temp = subset(temp,type == as.character(input$type))
+    temp = arrange(temp,desc(value))[1:input$number_countries,]
+    index = match(input$commodity_3D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
+    maxValue = log(max(temp$value))
+    map_palette = map_pal[,index]
+    clrs = rep('#050505', length(wrld_simpl$NAME))
+    names(clrs) = wrld_simpl$NAME
+    clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
+    ##### end subset
+    
+    g = ggplot(data = temp, aes(x = Country, y = value)) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country)
+    g
+    
+  })
+  ## end ggplot
+  
+  
+  
+  ## 2D map
+  output$mymap <- renderLeaflet({
+    ## Control Icon size and looks
+    Icon <- makeIcon(
+      iconWidth = 3, iconHeight = 3,
+      iconAnchorX = 19, iconAnchorY = 19
+    )
+    ## subset the data
+    US = data.frame(Country = "US",longitude = -95.71289,latitude = 37.09024)
+    ##### subset dataframe
+    tmp = input_data
+    tmp = subset(tmp,Commodity_Name == as.character(input$commodity_2D))
+    tmp = subset(tmp,Year == as.integer(input$year_2D))
+    tmp = subset(tmp,type == as.character(input$type_2D))
+    tmp = arrange(tmp,desc(value))[1:input$num_countries,]
+    rank = 1:nrow(tmp)
+    tmp$rank = paste(tmp$Country,"ranks No.",rank)
+    index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
+    ##### end subset      
+    leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
+      addMarkers(popup=~rank,icon = Icon)%>%
+      
+      addMarkers(data = US, popup=~Country,icon = Icon)%>%  
+      setView(lng=116.38,lat=39.9,zoom=2)
+  })
+  ## end 2D map
+  
+  
+  
+  ## MotionChart
+  output$view <- renderGvis({
+    gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee', options=list(width="800", height="800"))
+  })
+  ## end MotionChart
+  
+  
 }
-
-
-## Calling shiny App
-shinyApp(ui = ui, server= server)
