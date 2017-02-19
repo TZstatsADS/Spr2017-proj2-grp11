@@ -48,6 +48,31 @@ library("rgl")
 library("maptools")
 library("shiny")
 
+
+
+## preprocess work, Load dataframe already prepared for plotting
+input_data =  read.csv("data/mydata.csv",header = T,as.is = T)
+exchange_rate =  read.csv("data/exchange_rate.csv")
+input_data = input_data[!is.na(input_data$longitude),]
+input_data = input_data[input_data$value != 0,]
+#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
+input_data$log = ceiling(log(input_data$value)/3)-2
+## end preprocess data
+
+
+## mergring exchange rate data
+import <- filter(input_data, input_data$type=="Import") 
+Export <- filter(input_data, input_data$type=="Export") 
+import$id <- paste0(import$Country,"/",import$Year)
+import<-merge(x = import, y = exchange_rate, by = "id", all.x = TRUE)
+
+import.without.aggregate <- filter(import, import$Commodity_Name != "Annual Aggregate")
+import.without.aggregate$source <- as.character(import.without.aggregate$Country)
+import.without.aggregate$target <- as.character(import.without.aggregate$Commodity_Name)
+
+
+##
+
 ## UI Function
 
 ui<- navbarPage(
@@ -108,18 +133,29 @@ ui<- navbarPage(
            )
   ),
   navbarMenu("Summary Stastics",
-             tabPanel("Component A"),
+             tabPanel("Exchange Rate", sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "exchange_commodity",
+                             label  = "choose the commodity",
+                             choices = c('Annual Aggregate','Chocolate', 'Coffee','COCOA','Spices','Tea'),
+                             selected ='SPICES'),
+                 selectInput(inputId = "exchange_country",
+                             label  = "choose the country",
+                             choices = unique(import$Country),
+                             selected ='China')
+               ),
+               
+               mainPanel(
+                 plotOutput("linear_exchange")
+               )
+             )
+                      
+                      ),
              tabPanel("Component B")),
   tabPanel("More")
 )
 
-## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("data/mydata.csv",header = T,as.is = T)
-input_data = input_data[!is.na(input_data$longitude),]
-input_data = input_data[input_data$value != 0,]
-#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
-input_data$log = ceiling(log(input_data$value)/3)-2
-## end preprocess data
+
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
@@ -209,6 +245,14 @@ server<- function(input, output){
         addMarkers(data = US, popup=~Country,icon = Icon)%>%  
         setView(lng=116.38,lat=39.9,zoom=2)
   })
+    output$linear_exchange <-renderPlot({
+      title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
+      temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
+                     import$Country == input$exchange_country)
+      plot(temp$rate,temp$value, main = title,
+           xlab="exchange rate", ylab="yearly import")
+      text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
+    })
 }
 
 
