@@ -19,7 +19,8 @@ packages.used <-
     "reshape2",
     "maptools",
     "shiny",
-    "googleVis"
+    "googleVis",
+    "dplyr"
   )
 
 # check packages that need to be installed.
@@ -33,6 +34,7 @@ if(length(packages.needed)>0){
 
 #load the packages
 library("plyr")
+library("dplyr")
 library("reshape2")
 library("geosphere")
 library("threejs")
@@ -50,6 +52,33 @@ library("rgl")
 library("maptools")
 library("shiny")
 library("googleVis")
+
+## preprocess work, Load dataframe already prepared for plotting
+input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
+input_data = input_data[!is.na(input_data$longitude),]
+input_data = input_data[input_data$value != 0,]
+#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
+input_data$log = ceiling(log(input_data$value)/3)-2
+#Load the data for Google motion data
+country<-read.csv("../data/country_cleaned.csv")
+## end preprocess data
+
+
+
+## mergring exchange rate data
+exchange_rate =  read.csv("..data/exchange_rate.csv")
+CPI =  read.csv("..data/CPI.csv")
+import <- filter(input_data, input_data$type=="Import") 
+Export <- filter(input_data, input_data$type=="Export") 
+import$id <- paste0(import$Country,"/",import$Year)
+import<-merge(x = import, y = exchange_rate, by = "id", all.x = TRUE)
+
+import.without.aggregate <- filter(import, import$Commodity_Name != "Annual Aggregate")
+import.without.aggregate$source <- as.character(import.without.aggregate$Country)
+import.without.aggregate$target <- as.character(import.without.aggregate$Commodity_Name)
+
+
+##
 
 ## UI Function
 
@@ -119,7 +148,16 @@ ui<- navbarPage(
   ## end 2D Map tab
   
   ## Summary Statistics tab
-  navbarMenu("Summary Stastics",
+  navbarMenu("Summary Statistics",
+             
+             ### Motion Chart
+             tabPanel("Motion Chart",
+                      mainPanel(
+                        htmlOutput("view")
+                      )
+             ),
+             ### end Motion Chart
+             
              tabPanel("Exchange Rate", sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "exchange_commodity",
@@ -136,43 +174,15 @@ ui<- navbarPage(
                  plotOutput("linear_exchange")
                )
              )
-                      
-                      ),
-             tabPanel("Motion chart",
-                     mainPanel(
-                          htmlOutput("view")
-                          ))
-             tabPanel("Tree map",
-                      titlePanel("Tree map for certain year and commodity"),
-                      sidebarLayout(
-                        sidebarPanel = (
-                          selectInput(
-                            inputId = "com_tree",
-                            label  = "Choose the commodity",
-                            choices = c('Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                            selected ='Tea')),
-                          sliderInput(
-                            inputId = "year_tree",
-                            label = "Select a year",
-                            value = 1996, min =1996, max =2016)),
-                      mainPanel(
-                        plotOutput("treemap",height = 600, width = 600)))
-             )),
- 
+             
+             )
+  ),
   ## end Summary Statistics tab
   
   tabPanel("More")
 )
 
-## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
-input_data = input_data[!is.na(input_data$longitude),]
-input_data = input_data[input_data$value != 0,]
-#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
-input_data$log = ceiling(log(input_data$value)/3)-2
-#Load the data for Google motion data
-country<-read.csv("../data/country_cleaned.csv")
-## end preprocess data
+
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
@@ -285,7 +295,7 @@ server<- function(input, output){
                      "ranks No.",rank,"<br/>",
                      "Annual Trade Value: $",tmp$value,"<br/>",sep = "",
                      "<a href='https://en.wikipedia.org/wiki/",tmp$Country,"'>Wikipedia Page</a>","<br/>",
-                     "<a href='https://www.wsj.com/search/term.html?KEYWORDS",tmp$Country,"'>Wall Street Journal Page</a>"
+                     "<a href='https://www.youtube.com/results?search_query=Discover",tmp$Country,"'>Youtube Page</a>"
     )
     index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
     Colors = c("#231d65","#276d98","#2586a4","#3c6049","#216957","#4abf8c","#9eae1e","#eff09e")
@@ -312,7 +322,16 @@ server<- function(input, output){
   })
   ## end MotionChart
   
-  
+  ## exchange rate
+  output$linear_exchange <-renderPlot({
+    title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
+    temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
+                   import$Country == input$exchange_country)
+    plot(temp$rate,temp$value, main = title,
+         xlab="exchange rate", ylab="yearly import")
+    text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
+  })
+  ##end exchange rate
 }
 
 
@@ -338,7 +357,8 @@ packages.used <-
     "reshape2",
     "maptools",
     "shiny",
-    "googleVis"
+    "googleVis",
+    "dplyr"
   )
 
 # check packages that need to be installed.
@@ -352,6 +372,7 @@ if(length(packages.needed)>0){
 
 #load the packages
 library("plyr")
+library("dplyr")
 library("reshape2")
 library("geosphere")
 library("threejs")
@@ -369,6 +390,34 @@ library("rgl")
 library("maptools")
 library("shiny")
 library("googleVis")
+
+
+## preprocess work, Load dataframe already prepared for plotting
+input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
+input_data = input_data[!is.na(input_data$longitude),]
+input_data = input_data[input_data$value != 0,]
+#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
+input_data$log = ceiling(log(input_data$value)/3)-2
+#Load the data for Google motion data
+country<-read.csv("../data/country_cleaned.csv")
+## end preprocess data
+
+
+
+## mergring exchange rate data
+exchange_rate =  read.csv("..data/exchange_rate.csv")
+CPI =  read.csv("..data/CPI.csv")
+import <- filter(input_data, input_data$type=="Import") 
+Export <- filter(input_data, input_data$type=="Export") 
+import$id <- paste0(import$Country,"/",import$Year)
+import<-merge(x = import, y = exchange_rate, by = "id", all.x = TRUE)
+
+import.without.aggregate <- filter(import, import$Commodity_Name != "Annual Aggregate")
+import.without.aggregate$source <- as.character(import.without.aggregate$Country)
+import.without.aggregate$target <- as.character(import.without.aggregate$Commodity_Name)
+
+
+##
 
 ## UI Function
 
@@ -448,20 +497,28 @@ ui<- navbarPage(
              ),
              ### end Motion Chart
              
-             tabPanel("Component B")
+             tabPanel("Exchange Rate", sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "exchange_commodity",
+                             label  = "choose the commodity",
+                             choices = c('Annual Aggregate','Chocolate', 'Coffee','COCOA','Spices','Tea'),
+                             selected ='SPICES'),
+                 selectInput(inputId = "exchange_country",
+                             label  = "choose the country",
+                             choices = unique(import$Country),
+                             selected ='China')
+               ),
+               
+               mainPanel(
+                 plotOutput("linear_exchange")
+               )
+             )
   ),
   ## end Summary Statistics tab
   
   tabPanel("More")
 )
 
-## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
-input_data = input_data[!is.na(input_data$longitude),]
-input_data = input_data[input_data$value != 0,]
-#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
-input_data$log = ceiling(log(input_data$value)/3)-2
-## end preprocess data
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
@@ -601,18 +658,16 @@ server<- function(input, output){
   })
   ## end MotionChart
   
-  ## Tree Map
-   output$treemap<-renderPlot({
-   country<-read.csv("country_cleaned.csv")
-   #selcet a year and a one of the five categories
-   sub_country<-country[country$Year==input$year_tree,]
-   sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
-   treemap(sub_country, index='Country', vSize=toString(input$com_tree), vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
- })
-  
-  ##end TreeMap
-
-  
+  ## exchange rate
+  output$linear_exchange <-renderPlot({
+    title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
+    temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
+                   import$Country == input$exchange_country)
+    plot(temp$rate,temp$value, main = title,
+         xlab="exchange rate", ylab="yearly import")
+    text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
+  })
+  ##end exchange rate
 }
 
 
