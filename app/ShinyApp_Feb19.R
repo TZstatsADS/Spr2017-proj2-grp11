@@ -119,18 +119,46 @@ ui<- navbarPage(
   ## end 2D Map tab
   
   ## Summary Statistics tab
-  navbarMenu("Summary Statistics",
-             
-             ### Motion Chart
-             tabPanel("Motion Chart",
+  navbarMenu("Summary Stastics",
+             tabPanel("Exchange Rate", sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "exchange_commodity",
+                             label  = "choose the commodity",
+                             choices = c('Annual Aggregate','Chocolate', 'Coffee','COCOA','Spices','Tea'),
+                             selected ='SPICES'),
+                 selectInput(inputId = "exchange_country",
+                             label  = "choose the country",
+                             choices = unique(import$Country),
+                             selected ='China')
+               ),
+               
+               mainPanel(
+                 plotOutput("linear_exchange")
+               )
+             )
+                      
+                      ),
+             tabPanel("Motion chart",
+                     mainPanel(
+                          htmlOutput("view")
+                          ))
+             tabPanel("Tree map",
+                      titlePanel("Tree map for certain year and commodity"),
+                      sidebarLayout(
+                        sidebarPanel = (
+                          selectInput(
+                            inputId = "com_tree",
+                            label  = "Choose the commodity",
+                            choices = c('Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                            selected ='Tea')),
+                          sliderInput(
+                            inputId = "year_tree",
+                            label = "Select a year",
+                            value = 1996, min =1996, max =2016)),
                       mainPanel(
-                        htmlOutput("view")
-                      )
-             ),
-             ### end Motion Chart
-             
-             tabPanel("Component B")
-  ),
+                        plotOutput("treemap",height = 600, width = 600)))
+             )),
+ 
   ## end Summary Statistics tab
   
   tabPanel("More")
@@ -573,6 +601,17 @@ server<- function(input, output){
   })
   ## end MotionChart
   
+  ## Tree Map
+   output$treemap<-renderPlot({
+   country<-read.csv("country_cleaned.csv")
+   #selcet a year and a one of the five categories
+   sub_country<-country[country$Year==input$year_tree,]
+   sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
+   treemap(sub_country, index='Country', vSize=toString(input$com_tree), vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
+ })
+  
+  ##end TreeMap
+
   
 }
 
