@@ -257,7 +257,7 @@ server<- function(input, output){
                      "ranks No.",rank,"<br/>",
                      "Annual Trade Value: $",tmp$value,"<br/>",sep = "",
                      "<a href='https://en.wikipedia.org/wiki/",tmp$Country,"'>Wikipedia Page</a>","<br/>",
-                     "<a href='https://www.youtube.com/results?search_query=Discover",tmp$Country,"'>Youtube Page</a>"
+                     "<a href='https://www.wsj.com/search/term.html?KEYWORDS",tmp$Country,"'>Wall Street Journal Page</a>"
     )
     index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
     Colors = c("#231d65","#276d98","#2586a4","#3c6049","#216957","#4abf8c","#9eae1e","#eff09e")
