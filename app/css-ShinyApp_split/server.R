@@ -19,6 +19,7 @@ packages.used <-
     "reshape2",
     "maptools",
     "shiny",
+    "shinytheme",
     "googleVis"
   )
 
@@ -57,7 +58,7 @@ input_data =  read.csv("../../data/mydata.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
 #create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
-input_data$log = ceiling(log(input_data$value)/3)-2
+input_data$log = paste("level",ceiling(log(input_data$value)/2)-3,sep = "")
 #Load the data for Google motion data
 country<-read.csv("../../data/country_cleaned.csv")
 ## end preprocess data
@@ -147,10 +148,18 @@ server<- function(input, output){
   ## 2D map
   output$mymap <- renderLeaflet({
     ## Control Icon size and looks
-    Icon <- makeIcon(
-      iconWidth = 3, iconHeight = 3,
-      iconAnchorX = 19, iconAnchorY = 19
-    )
+    levelIcon <- iconList(
+      level1 = makeIcon("trade-icon_1.png", iconAnchorX = 19, iconAnchorY = 19),
+      level2 = makeIcon("trade-icon_2.png", iconAnchorX = 19, iconAnchorY = 19),
+      level3 = makeIcon("trade-icon_3.png", iconAnchorX = 19, iconAnchorY = 19),
+      level4 = makeIcon("trade-icon_4.png", iconAnchorX = 19, iconAnchorY = 19),
+      level5 = makeIcon("trade-icon_5.png", iconAnchorX = 19, iconAnchorY = 19),
+      level6 = makeIcon("trade-icon_6.png", iconAnchorX = 19, iconAnchorY = 19),
+      level7 = makeIcon("trade-icon_7.png", iconAnchorX = 19, iconAnchorY = 19),
+      level8 = makeIcon("trade-icon_8.png", iconAnchorX = 19, iconAnchorY = 19)
+      )
+    Icon = makeIcon(iconAnchorX = 19, iconAnchorY = 19,
+                    iconWidth = 38, iconHeight = 38)
     ## subset the data
     US = data.frame(Country = "US",longitude = -95.71289,latitude = 37.09024)
     ##### subset dataframe
@@ -160,14 +169,20 @@ server<- function(input, output){
     tmp = subset(tmp,type == as.character(input$type_2D))
     tmp = arrange(tmp,desc(value))[1:input$num_countries,]
     rank = 1:nrow(tmp)
-    tmp$rank = paste(tmp$Country,"ranks No.",rank)
+    Log = paste("level",ceiling(log(tmp$value)/2)-3,sep = "")
+    tmp$rank = paste(tmp$Country,"<br/>",
+                     "ranks No.",rank,"<br/>",
+                     "Annual Trade Value: $",tmp$value,"<br/>",sep = "",
+                     "<a href='https://en.wikipedia.org/wiki/",tmp$Country,"'>Wikipedia Page</a>","<br/>",
+                     "<a href='https://www.youtube.com/results?search_query=Discover",tmp$Country,"'>Youtube Page</a>"
+                     )
     index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
     ##### end subset      
     leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
-      addMarkers(popup=~rank,icon = Icon)%>%
-      
-      addMarkers(data = US, popup=~Country,icon = Icon)%>%  
-      setView(lng=116.38,lat=39.9,zoom=2)
+      addMarkers(popup=~rank,icon = ~levelIcon[Log])%>%
+      addMarkers(data = US, 
+                 popup=~Country,icon = ~Icon)%>%  
+      setView(lng=-30,lat=28,zoom=3) #put US in the centre
   })
   ## end 2D map
   

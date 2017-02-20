@@ -52,7 +52,7 @@ ui<- navbarPage(
                            value = 1996, min =1996, max =2016),
                sliderInput(inputId = "num_countries",
                            label = "Top Countries in Trade",
-                           value = 10,min = 1,max = 50),
+                           value = 30,min = 1,max = 50),
                selectInput(inputId = "commodity_2D",
                            label  = "Select the commodity",
                            choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
