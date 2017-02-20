@@ -100,10 +100,10 @@ ui<- navbarPage(
                             selected ='Export'),
                sliderInput(inputId = "year_2D",
                            label = "Select a year",
-                           value = 1996, min =1996, max =2016),
+                           value = 2016, min =1996, max =2016),
                sliderInput(inputId = "num_countries",
                            label = "Top Countries in Trade",
-                           value = 10,min = 1,max = 50),
+                           value = 30,min = 1,max = 50),
                selectInput(inputId = "commodity_2D",
                            label  = "Select the commodity",
                            choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
@@ -228,10 +228,18 @@ server<- function(input, output){
   ## 2D map
   output$mymap <- renderLeaflet({
     ## Control Icon size and looks
-    Icon <- makeIcon(
-      iconWidth = 3, iconHeight = 3,
-      iconAnchorX = 19, iconAnchorY = 19
+    levelIcon <- iconList(
+      level1 = makeIcon("css-ShinyApp_split/www/trade-icon_1.png", iconAnchorX = 19, iconAnchorY = 19),
+      level2 = makeIcon("css-ShinyApp_split/www/trade-icon_2.png", iconAnchorX = 19, iconAnchorY = 19),
+      level3 = makeIcon("css-ShinyApp_split/www/trade-icon_3.png", iconAnchorX = 19, iconAnchorY = 19),
+      level4 = makeIcon("css-ShinyApp_split/www/trade-icon_4.png", iconAnchorX = 19, iconAnchorY = 19),
+      level5 = makeIcon("css-ShinyApp_split/www/trade-icon_5.png", iconAnchorX = 19, iconAnchorY = 19),
+      level6 = makeIcon("css-ShinyApp_split/www/trade-icon_6.png", iconAnchorX = 19, iconAnchorY = 19),
+      level7 = makeIcon("css-ShinyApp_split/www/trade-icon_7.png", iconAnchorX = 19, iconAnchorY = 19),
+      level8 = makeIcon("css-ShinyApp_split/www/trade-icon_8.png", iconAnchorX = 19, iconAnchorY = 19)
     )
+    Icon = makeIcon(iconAnchorX = 19, iconAnchorY = 19,
+                    iconWidth = 38, iconHeight = 38)
     ## subset the data
     US = data.frame(Country = "US",longitude = -95.71289,latitude = 37.09024)
     ##### subset dataframe
@@ -241,14 +249,20 @@ server<- function(input, output){
     tmp = subset(tmp,type == as.character(input$type_2D))
     tmp = arrange(tmp,desc(value))[1:input$num_countries,]
     rank = 1:nrow(tmp)
-    tmp$rank = paste(tmp$Country,"ranks No.",rank)
+    Log = paste("level",ceiling(log(tmp$value)/2)-3,sep = "")
+    tmp$rank = paste(tmp$Country,"<br/>",
+                     "ranks No.",rank,"<br/>",
+                     "Annual Trade Value: $",tmp$value,"<br/>",sep = "",
+                     "<a href='https://en.wikipedia.org/wiki/",tmp$Country,"'>Wikipedia Page</a>","<br/>",
+                     "<a href='https://www.youtube.com/results?search_query=Discover",tmp$Country,"'>Youtube Page</a>"
+    )
     index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
     ##### end subset      
     leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
-      addMarkers(popup=~rank,icon = Icon)%>%
-      
-      addMarkers(data = US, popup=~Country,icon = Icon)%>%  
-      setView(lng=116.38,lat=39.9,zoom=2)
+      addMarkers(popup=~rank,icon = ~levelIcon[Log])%>%
+      addMarkers(data = US, 
+                 popup=~Country,icon = ~Icon)%>%  
+      setView(lng=-30,lat=28,zoom=3) #put US in the centre
   })
   ## end 2D map
   
