@@ -20,7 +20,8 @@ packages.used <-
     "maptools",
     "shiny",
     "googleVis",
-    "dplyr"
+    "dplyr",
+    "plotly"
   )
 
 # check packages that need to be installed.
@@ -52,6 +53,7 @@ library("rgl")
 library("maptools")
 library("shiny")
 library("googleVis")
+library("plotly")
 
 ## preprocess work, Load dataframe already prepared for plotting
 input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
@@ -179,10 +181,32 @@ ui<- navbarPage(
   ),
   ## end Summary Statistics tab
   
+  ## Clustering tab
+  
+  tabPanel("Clustering Analysis",
+           titlePanel("Clustering Analysis"),
+           sidebarLayout(
+             sidebarPanel(
+               radioButtons(inputId = "type",
+                            label  = "Choose import/export",
+                            choices = c('Export','Import'),
+                            selected ='Export'),
+               sliderInput(inputId = "number_clusters",
+                           label = "Number of Clusters",
+                           value = 5,min = 2,max = 20),
+               width = 3
+             ),
+             mainPanel(
+               plotlyOutput("cluster", width = "100%", height = "400px"),
+               verbatimTextOutput("click")
+             )
+           )
+  
+  ),
+  ## end Clustering tab
+  
   tabPanel("More")
 )
-
-
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
@@ -239,8 +263,6 @@ server<- function(input, output){
   })
   ## end 3D Globe
   
-  
-  
   ## ggplot
   output$ggplot <- renderPlot({
     
@@ -258,7 +280,7 @@ server<- function(input, output){
     clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     ##### end subset
     
-    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "white"),axis.text.y = element_text(colour = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
+    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.y = element_text(colour = "white")) + theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
     g
     
   })
@@ -332,6 +354,34 @@ server<- function(input, output){
     text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
   })
   ##end exchange rate
+  
+  ## Cluster visuals
+  output$cluster <- renderPlotly({
+    df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+    g <- list(
+      showframe = FALSE,
+      showcoastlines = FALSE,
+      projection = list(type = 'Mercator')
+    )
+    
+    plot_geo(df) %>%
+      add_trace(
+        z = ~GDP..BILLIONS., color = ~GDP..BILLIONS., colors = 'Blues',
+        text = ~COUNTRY, locations = ~CODE, marker = list(line = l)
+      ) %>%
+      colorbar(title = 'GDP Billions US$', tickprefix = '$') %>%
+      layout(
+        title = 'clustering Visual',
+        geo = g
+      )
+  })
+  
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click on a state to view event data" else d
+  })
+  ## end cluster visual
+  
 }
 
 
