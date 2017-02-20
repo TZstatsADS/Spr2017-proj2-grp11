@@ -257,12 +257,18 @@ server<- function(input, output){
                      "<a href='https://www.youtube.com/results?search_query=Discover",tmp$Country,"'>Youtube Page</a>"
     )
     index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
+    Colors = c("#231d65","#276d98","#2586a4","#3c6049","#216957","#4abf8c","#9eae1e","#eff09e")
+    Labels = paste("Level:",1:8)
     ##### end subset      
     leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
       addMarkers(popup=~rank,icon = ~levelIcon[Log])%>%
       addMarkers(data = US, 
                  popup=~Country,icon = ~Icon)%>%  
-      setView(lng=-30,lat=28,zoom=3) #put US in the centre
+      setView(lng=-30,lat=28,zoom=3)%>%#put US in the centre
+      addLegend("bottomright", colors = Colors, labels = Labels,
+                title = "Value From Large to Small",
+                labFormat = labelFormat(prefix = "$"),
+                opacity = 1)
   })
   ## end 2D map
   
