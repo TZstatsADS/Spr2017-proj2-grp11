@@ -54,7 +54,9 @@ library("maptools")
 library("shiny")
 library("googleVis")
 library("plotly")
-
+library("grid")
+library("gtable")
+source("../lib/double-axis.R")
 ## preprocess work, Load dataframe already prepared for plotting
 input_data =  read.csv("../data/mydata_wRegions.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
@@ -182,16 +184,18 @@ ui<- navbarPage(
              ### end Exchange Rate
              
              ### Mirror Histogram
-             tabPanel("Mirror Histogram", sidebarLayout(
+             tabPanel("Mirror Histogram",
+              titlePanel("Trade Trend vs Exchange Rate"),
+              sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "commodity_hist",
                              label  = "choose the commodity",
                              choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                             selected ='Chocolate'),
+                             selected ='Tea'),
                  selectInput(inputId = "country_hist",
                              label  = "choose the country",
                              choices = unique(input_data$Country),
-                             selected ='China')
+                             selected ='Canada')
                ),
                
                mainPanel(
@@ -408,7 +412,8 @@ server<- function(input, output){
     tp = subset(tp,Country == as.character(input$country_hist))
     tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
     tp = tp[order(tp$type,decreasing = T),]#put import first
-    
+    Rate = exchange_rate
+    Rate = subset(Rate,Country.Name == as.character(input$country_hist))
     ##Data frame for ggplot2
     dat <- data.frame(
       group = tp$type,
@@ -417,9 +422,21 @@ server<- function(input, output){
     )
     
     ##plotting
-    ggplot(dat, aes(x=Year, y=Value, fill=group))+
+    library(grid)
+    plot1  = ggplot(dat, aes(x=Year, y=Value, fill=group))+
       geom_bar(stat="identity", position="identity")+
       scale_fill_manual(values=c("#87CEFA","#DC143C"))
+    plot2 = ggplot(Rate,aes(x = year,y = rate))+
+      geom_line(color = "Black")+
+      coord_cartesian(ylim=c(0, max(Rate$rate)))+
+      ylab("Exchange rate")
+    plot1 <- plot1 + theme_bw() + theme(legend.position="top")
+    plot2 <- plot2 + theme_bw() + theme(panel.grid=element_blank()) +
+      theme(panel.background = element_rect(fill = NA))
+    #plot the exchange rate line on the histogram
+    #with 2 different y-axis
+    #use self-written function"double_axis_graph
+    plot(double_axis_graph(plot1,plot2))
   })
   ## end Mirror Histogram
   
