@@ -77,9 +77,91 @@ ui<- navbarPage(
              ),
              ### end Motion Chart
              
-             tabPanel("Component B")
+             ### Exchange Rate
+             tabPanel("Exchange Rate", sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "exchange_commodity",
+                             label  = "choose the commodity",
+                             choices = unique(import$Commodity_Name),
+                             selected ='Spices'),
+                 selectInput(inputId = "exchange_country",
+                             label  = "choose the country",
+                             choices = unique(import$Country),
+                             selected ='China')
+               ),
+               
+               mainPanel(
+                 plotOutput("linear_exchange")
+               )
+             )
+             
+             ),
+             ### end Exchange Rate
+             
+             ### Mirror Histogram
+             tabPanel("Mirror Histogram", sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "commodity_hist",
+                             label  = "choose the commodity",
+                             choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                             selected ='Chocolate'),
+                 selectInput(inputId = "country_hist",
+                             label  = "choose the country",
+                             choices = unique(input_data$Country),
+                             selected ='China')
+               ),
+               
+               mainPanel(
+                 plotOutput("Hist")
+               )
+             )
+             
+             ),
+             ### end Mirror Histogram
+             
+             ### Regional statistics
+             tabPanel("Regional statistics",sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "Regional_commodity",
+                             label  = "choose the commodity",
+                             choices = unique(input_data$Commodity_Name),
+                             selected ='Spices'),
+                 sliderInput(inputId = "Regional_year",
+                             label = "Select a year",
+                             value = 2016, min =1996, max =2016)
+               ),
+               
+               mainPanel(
+                 plotOutput("regional_import")
+               )
+             )
+             )
   ),
   ## end Summary Statistics tab
+  
+  ## Clustering tab
+  
+  tabPanel("Clustering Analysis",
+           titlePanel("Clustering Analysis"),
+           sidebarLayout(
+             sidebarPanel(
+               radioButtons(inputId = "type",
+                            label  = "Choose import/export",
+                            choices = c('Export','Import'),
+                            selected ='Export'),
+               sliderInput(inputId = "number_clusters",
+                           label = "Number of Clusters",
+                           value = 5,min = 2,max = 20),
+               width = 3
+             ),
+             mainPanel(
+               plotlyOutput("cluster", width = "100%", height = "400px"),
+               verbatimTextOutput("click")
+             )
+           )
+           
+  ),
+  ## end Clustering tab
   
   tabPanel("More")
 )

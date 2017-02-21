@@ -19,7 +19,9 @@ packages.used <-
     "reshape2",
     "maptools",
     "shiny",
-    "googleVis"
+    "googleVis",
+    "dplyr",
+    "plotly"
   )
 
 # check packages that need to be installed.
@@ -50,9 +52,11 @@ library("rgl")
 library("maptools")
 library("shiny")
 library("googleVis")
+library("dplyr")
+library("plotly")
 
 ## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("../../data/mydata.csv",header = T,as.is = T)
+input_data =  read.csv("../../data/mydata_wRegions.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
 #create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
@@ -68,6 +72,19 @@ arc_colors = c("#998080","#809980","#808099","#999980","#809999","#998099")
 map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
+
+## mergring exchange rate data
+exchange_rate =  read.csv("../../data/exchange_rate.csv")
+CPI =  read.csv("../../data/CPI.csv")
+import <- filter(input_data, input_data$type=="Import") 
+Export <- filter(input_data, input_data$type=="Export") 
+import$id <- paste0(import$Country,"/",import$Year)
+import<-merge(x = import, y = exchange_rate, by = "id", all.x = TRUE)
+
+import.without.aggregate <- filter(import, import$Commodity_Name != "Annual Aggregate")
+import.without.aggregate$source <- as.character(import.without.aggregate$Country)
+import.without.aggregate$target <- as.character(import.without.aggregate$Commodity_Name)
+##
 
 
 ## Server function
@@ -135,7 +152,7 @@ server<- function(input, output){
     clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     ##### end subset
     
-    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(legend.position="none") + theme(legend.background = element_rect(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
+    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
     g
     
   })
@@ -173,24 +190,100 @@ server<- function(input, output){
                      "Annual Trade Value: $",tmp$value,"<br/>",sep = "",
                      "<a href='https://en.wikipedia.org/wiki/",tmp$Country,"'>Wikipedia Page</a>","<br/>",
                      "<a href='https://www.youtube.com/results?search_query=Discover",tmp$Country,"'>Youtube Page</a>"
-                     )
+    )
     index = match(input$commodity_2D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
+    Colors = c("#231d65","#276d98","#2586a4","#3c6049","#216957","#4abf8c","#9eae1e","#eff09e")
+    Labels = paste("Level:",1:8)
     ##### end subset      
     leaflet(tmp)%>%addProviderTiles("Esri.WorldStreetMap")%>%
       addMarkers(popup=~rank,icon = ~levelIcon[Log])%>%
       addMarkers(data = US, 
                  popup=~Country,icon = ~Icon)%>%  
-      setView(lng=-30,lat=28,zoom=3) #put US in the centre
+      setView(lng=-30,lat=28,zoom=3)%>%#put US in the centre
+      addLegend("bottomright", colors = Colors, labels = Labels,
+                title = "Value From Large to Small",
+                labFormat = labelFormat(prefix = "$"),
+                opacity = 1)
   })
   ## end 2D map
   
-  
-  
   ## MotionChart
   output$view <- renderGvis({
+    
     gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee', options=list(width="800", height="800"))
   })
   ## end MotionChart
+  
+  ## exchange rate
+  output$linear_exchange <-renderPlot({
+    title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
+    temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
+                   import$Country == input$exchange_country)
+    plot(temp$rate,temp$value, main = title,
+         xlab="exchange rate", ylab="yearly import")
+    text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
+  })
+  ##end exchange rate
+  
+  ## Mirror Histogram
+  output$Hist <- renderPlot({
+    ##Subset
+    tp = input_data
+    tp = subset(tp,Country == as.character(input$country_hist))
+    tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
+    tp = tp[order(tp$type,decreasing = T),]#put import first
+    
+    ##Data frame for ggplot2
+    dat <- data.frame(
+      group = tp$type,
+      Year = tp$Year,
+      Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
+    )
+    
+    ##plotting
+    ggplot(dat, aes(x=Year, y=Value, fill=group))+
+      geom_bar(stat="identity", position="identity")+
+      scale_fill_manual(values=c("#87CEFA","#DC143C"))
+  })
+  ## end Mirror Histogram
+  
+  ##regional analysis
+  output$regional_import <- renderPlot({
+    title <- paste(input$Regional_year, input$Regional_commodity, "import",sep = " ")
+    temp <- filter(input_data, input_data$Year == input$Regional_year ,
+                   input_data$type == "Import",
+                   input_data$Commodity_Name == input$Regional_commodity)
+    temp_1<-aggregate(value ~ Continent, temp, sum)
+    pie(temp_1$value, labels = temp_1$Continent,  main = title)
+  })
+  ##
+  
+  ## Cluster visuals
+  output$cluster <- renderPlotly({
+    df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+    g <- list(
+      showframe = FALSE,
+      showcoastlines = FALSE,
+      projection = list(type = 'Mercator')
+    )
+    
+    plot_geo(df) %>%
+      add_trace(
+        z = ~GDP..BILLIONS., color = ~GDP..BILLIONS., colors = 'Blues',
+        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l')
+      ) %>%
+      colorbar(title = 'GDP Billions US$', tickprefix = '$') %>%
+      layout(
+        title = 'clustering Visual',
+        geo = g
+      )
+  })
+  
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click on a state to view event data" else d
+  })
+  ## end cluster visual
   
   
 }
