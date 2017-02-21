@@ -178,7 +178,7 @@ ui<- navbarPage(
              )
              
              ),
-             tabPanel("Regional statistics",sidebarLayout(
+             tabPanel("Continent statistics",sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "Regional_commodity",
                              label  = "choose the commodity",
@@ -190,11 +190,24 @@ ui<- navbarPage(
                ),
                
                mainPanel(
-                 plotOutput("regional_import")
+                 plotOutput("continent_import")
                )
              )
-             )
-  ),
+             ),
+             tabPanel( "Regional statistics",sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "Regional_commodity_sub",
+                             label  = "choose the commodity",
+                             choices = unique(input_data$Commodity_Name),
+                             selected ='Spices'),
+                 sliderInput(inputId = "Regional_year_sub",
+                             label = "Select a year",
+                             value = 2016, min =1996, max =2016)
+               ),
+               
+               mainPanel(
+                 plotOutput("regional_import")
+  ))),
   ## end Summary Statistics tab
   
   ## Clustering tab
@@ -222,6 +235,7 @@ ui<- navbarPage(
   ## end Clustering tab
   
   tabPanel("More")
+)
 )
 
 ## map creation preprocess
@@ -372,7 +386,7 @@ server<- function(input, output){
   ##end exchange rate
   
   ##regional analysis
-  output$regional_import <- renderPlot({
+  output$continent_import <- renderPlot({
     title <- paste(input$Regional_year, input$Regional_commodity, "import",sep = " ")
     temp <- filter(input_data, input_data$Year == input$Regional_year ,
                    input_data$type == "Import",
@@ -494,9 +508,9 @@ import.without.aggregate$source <- as.character(import.without.aggregate$Country
 import.without.aggregate$target <- as.character(import.without.aggregate$Commodity_Name)
 
 
-##
 
 ## UI Function
+
 ui<- navbarPage(
   
   ##link to css.file
@@ -591,7 +605,7 @@ ui<- navbarPage(
              )
              
              ),
-             tabPanel("Regional statistics",sidebarLayout(
+             tabPanel("Continent statistics",sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "Regional_commodity",
                              label  = "choose the commodity",
@@ -603,44 +617,58 @@ ui<- navbarPage(
                ),
                
                mainPanel(
-                 plotOutput("regional_import")
+                 plotOutput("continent_import")
                )
              )
-             )
-  ),
-  ## end Summary Statistics tab
-  
-  ## Clustering tab
-  
-  tabPanel("Clustering Analysis",
-           titlePanel("Clustering Analysis"),
-           sidebarLayout(
-             sidebarPanel(
-               radioButtons(inputId = "type",
-                            label  = "Choose import/export",
-                            choices = c('Export','Import'),
-                            selected ='Export'),
-               sliderInput(inputId = "number_clusters",
-                           label = "Number of Clusters",
-                           value = 5,min = 2,max = 20),
-               width = 3
              ),
-             mainPanel(
-               plotlyOutput("cluster", width = "100%", height = "400px"),
-               verbatimTextOutput("click")
-             )
-           )
-           
-  ),
-  ## end Clustering tab
-  
-  tabPanel("More")
+             tabPanel( "Regional statistics",sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "Regional_commodity_sub",
+                             label  = "choose the commodity",
+                             choices = unique(input_data$Commodity_Name),
+                             selected ='Spices'),
+                 sliderInput(inputId = "Regional_year_sub",
+                             label = "Select a year",
+                             value = 2016, min =1996, max =2016)
+               ),
+               
+               mainPanel(
+                 plotOutput("regional_import")
+               ))),
+             ## end Summary Statistics tab
+             
+             ## Clustering tab
+             
+             tabPanel("Clustering Analysis",
+                      titlePanel("Clustering Analysis"),
+                      sidebarLayout(
+                        sidebarPanel(
+                          radioButtons(inputId = "type",
+                                       label  = "Choose import/export",
+                                       choices = c('Export','Import'),
+                                       selected ='Export'),
+                          sliderInput(inputId = "number_clusters",
+                                      label = "Number of Clusters",
+                                      value = 5,min = 2,max = 20),
+                          width = 3
+                        ),
+                        mainPanel(
+                          plotlyOutput("cluster", width = "100%", height = "400px"),
+                          verbatimTextOutput("click")
+                        )
+                      )
+                      
+             ),
+             ## end Clustering tab
+             
+             tabPanel("More")
+  )
 )
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
 bgcolor = "#000000"
-arc_colors = c(alpha("red",0.001),alpha("blue",0.001),alpha("green",0.001),alpha("#ffe9bf",0.001),alpha("pink",0.001),alpha("orange",0.001))
+arc_colors = c("#998080","#809980","#808099","#999980","#809999","#998099")
 map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
@@ -692,8 +720,6 @@ server<- function(input, output){
   })
   ## end 3D Globe
   
-  
-  
   ## ggplot
   output$ggplot <- renderPlot({
     
@@ -711,7 +737,7 @@ server<- function(input, output){
     clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     ##### end subset
     
-    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
+    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.y = element_text(colour = "white")) + theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
     g
     
   })
@@ -787,17 +813,44 @@ server<- function(input, output){
   ##end exchange rate
   
   ##regional analysis
-  output$regional_import <- renderPlot({
+  output$continent_import <- renderPlot({
     title <- paste(input$Regional_year, input$Regional_commodity, "import",sep = " ")
     temp <- filter(input_data, input_data$Year == input$Regional_year ,
                    input_data$type == "Import",
                    input_data$Commodity_Name == input$Regional_commodity)
     temp_1<-aggregate(value ~ Continent, temp, sum)
-    pie(temp_1$value, labels = temp_1$Continent, main = title)
+    pie(temp_1$value, labels = temp_1$Continent,  main = title)
   })
   ##
+  
+  ## Cluster visuals
+  output$cluster <- renderPlotly({
+    df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+    g <- list(
+      showframe = FALSE,
+      showcoastlines = FALSE,
+      projection = list(type = 'Mercator')
+    )
+    
+    plot_geo(df) %>%
+      add_trace(
+        z = ~GDP..BILLIONS., color = ~GDP..BILLIONS., colors = 'Blues',
+        text = ~COUNTRY, locations = ~CODE, marker = list(line = l)
+      ) %>%
+      colorbar(title = 'GDP Billions US$', tickprefix = '$') %>%
+      layout(
+        title = 'clustering Visual',
+        geo = g
+      )
+  })
+  
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click on a state to view event data" else d
+  })
+  ## end cluster visual
+  
 }
-
 
 ## Calling shiny App
 >>>>>>> origin/master
