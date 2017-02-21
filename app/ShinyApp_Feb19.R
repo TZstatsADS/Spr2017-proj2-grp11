@@ -257,6 +257,11 @@ map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
 
+## Load clustering data
+cluster_data_import = read.csv("../data/clustering-ready-Import.csv")
+code = read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')[,c(1,3)]
+
+## end loading cluster data
 
 ## Server function
 
@@ -431,7 +436,16 @@ server<- function(input, output){
   
   ## Cluster visuals
   output$cluster <- renderPlotly({
-    df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+    
+    df1 = read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
+    
+    k = input$number_clusters
+    clusters = kmeans(t(cluster_data_import[,3:dim(cluster_data_import)[2]]),k)$cluster
+    df = as.data.frame(clusters)
+    df$COUNTRY = rownames(df)
+    df = merge(x = df, y = code, all.y = TRUE)
+    df[is.na(df$clusters),2] = 0
+    
     g <- list(
       showframe = FALSE,
       showcoastlines = FALSE,
@@ -440,12 +454,12 @@ server<- function(input, output){
     
     plot_geo(df) %>%
       add_trace(
-        z = ~GDP..BILLIONS., color = ~GDP..BILLIONS., colors = 'Blues',
+        z = ~clusters, color = ~clusters, colors = "Blues", 
         text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l')
       ) %>%
-      colorbar(title = 'GDP Billions US$', tickprefix = '$') %>%
+      colorbar(title = 'Cluster number', tickprefix = '') %>%
       layout(
-        title = 'clustering Visual',
+        title = 'Clustering Visual',
         geo = g
       )
   })
