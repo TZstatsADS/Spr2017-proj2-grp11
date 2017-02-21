@@ -21,7 +21,8 @@ packages.used <-
     "shiny",
     "googleVis",
     "dplyr",
-    "plotly"
+    "plotly",
+    "RColorBrewer"
   )
 
 # check packages that need to be installed.
@@ -56,6 +57,7 @@ library("googleVis")
 library("plotly")
 library("grid")
 library("gtable")
+library("RColorBrewer")
 source("../lib/double-axis.R")
 ## preprocess work, Load dataframe already prepared for plotting
 input_data =  read.csv("../data/mydata_wRegions.csv",header = T,as.is = T)
@@ -499,7 +501,7 @@ server<- function(input, output){
     
     plot_geo(df) %>%
       add_trace(
-        z = ~clusters, color = ~clusters, colors = "Blues", 
+        z = ~clusters, color = ~clusters, colors = brewer.pal(k, "RdYlGn"), type = "scatter", 
         text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l')
       ) %>%
       colorbar(title = 'Cluster number', tickprefix = '') %>%
