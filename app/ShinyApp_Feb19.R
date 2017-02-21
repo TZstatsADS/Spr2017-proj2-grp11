@@ -160,6 +160,7 @@ ui<- navbarPage(
              ),
              ### end Motion Chart
              
+             ### Exchange Rate
              tabPanel("Exchange Rate", sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "exchange_commodity",
@@ -178,6 +179,30 @@ ui<- navbarPage(
              )
              
              ),
+             ### end Exchange Rate
+             
+             ### Mirror Histogram
+             tabPanel("Mirror Histogram", sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "commodity_hist",
+                             label  = "choose the commodity",
+                             choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                             selected ='Chocolate'),
+                 selectInput(inputId = "country_hist",
+                             label  = "choose the country",
+                             choices = unique(input_data$Country),
+                             selected ='China')
+               ),
+               
+               mainPanel(
+                 plotOutput("Hist")
+               )
+             )
+             
+             ),
+             ### end Mirror Histogram
+             
+             ### Regional statistics
              tabPanel("Regional statistics",sidebarLayout(
                sidebarPanel(
                  selectInput(inputId = "Regional_commodity",
@@ -370,6 +395,28 @@ server<- function(input, output){
     text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
   })
   ##end exchange rate
+  
+  ## Mirror Histogram
+  output$Hist <- renderPlot({
+    ##Subset
+    tp = input_data
+    tp = subset(tp,Country == as.character(input$country_hist))
+    tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
+    tp = tp[order(tp$type,decreasing = T),]#put import first
+    
+    ##Data frame for ggplot2
+    dat <- data.frame(
+      group = tp$type,
+      Year = tp$Year,
+      Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
+    )
+    
+    ##plotting
+    ggplot(dat, aes(x=Year, y=Value, fill=group))+
+      geom_bar(stat="identity", position="identity")+
+      scale_fill_manual(values=c("#87CEFA","#DC143C"))
+  })
+  ## end Mirror Histogram
   
   ##regional analysis
   output$regional_import <- renderPlot({
