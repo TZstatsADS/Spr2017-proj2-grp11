@@ -437,8 +437,6 @@ server<- function(input, output){
   ## Cluster visuals
   output$cluster <- renderPlotly({
     
-    df1 = read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
-    
     k = input$number_clusters
     clusters = kmeans(t(cluster_data_import[,3:dim(cluster_data_import)[2]]),k)$cluster
     df = as.data.frame(clusters)
