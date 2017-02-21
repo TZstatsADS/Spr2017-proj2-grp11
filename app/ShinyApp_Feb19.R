@@ -56,7 +56,7 @@ library("googleVis")
 library("plotly")
 
 ## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
+input_data =  read.csv("../data/mydata_wRegions.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
 #create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
@@ -68,8 +68,8 @@ country<-read.csv("../data/country_cleaned.csv")
 
 
 ## mergring exchange rate data
-exchange_rate =  read.csv("..data/exchange_rate.csv")
-CPI =  read.csv("..data/CPI.csv")
+exchange_rate =  read.csv("../data/exchange_rate.csv")
+CPI =  read.csv("../data/CPI.csv")
 import <- filter(input_data, input_data$type=="Import") 
 Export <- filter(input_data, input_data$type=="Export") 
 import$id <- paste0(import$Country,"/",import$Year)
@@ -164,8 +164,8 @@ ui<- navbarPage(
                sidebarPanel(
                  selectInput(inputId = "exchange_commodity",
                              label  = "choose the commodity",
-                             choices = c('Annual Aggregate','Chocolate', 'Coffee','COCOA','Spices','Tea'),
-                             selected ='SPICES'),
+                             choices = unique(import$Commodity_Name),
+                             selected ='Spices'),
                  selectInput(inputId = "exchange_country",
                              label  = "choose the country",
                              choices = unique(import$Country),
@@ -177,6 +177,22 @@ ui<- navbarPage(
                )
              )
              
+             ),
+             tabPanel("Regional statistics",sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "Regional_commodity",
+                             label  = "choose the commodity",
+                             choices = unique(input_data$Commodity_Name),
+                             selected ='Spices'),
+                 sliderInput(inputId = "Regional_year",
+                             label = "Select a year",
+                             value = 2016, min =1996, max =2016)
+               ),
+               
+               mainPanel(
+                 plotOutput("regional_import")
+               )
+             )
              )
   ),
   ## end Summary Statistics tab
@@ -355,6 +371,17 @@ server<- function(input, output){
   })
   ##end exchange rate
   
+  ##regional analysis
+  output$regional_import <- renderPlot({
+    title <- paste(input$Regional_year, input$Regional_commodity, "import",sep = " ")
+    temp <- filter(input_data, input_data$Year == input$Regional_year ,
+                   input_data$type == "Import",
+                   input_data$Commodity_Name == input$Regional_commodity)
+    temp_1<-aggregate(value ~ Continent, temp, sum)
+    pie(temp_1$value, labels = temp_1$Continent,  main = title)
+  })
+  ##
+  
   ## Cluster visuals
   output$cluster <- renderPlotly({
     df <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_world_gdp_with_codes.csv')
@@ -443,7 +470,7 @@ library("googleVis")
 
 
 ## preprocess work, Load dataframe already prepared for plotting
-input_data =  read.csv("../data/mydata.csv",header = T,as.is = T)
+input_data =  read.csv("../data/mydata_wRegions.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
 #create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
@@ -470,7 +497,6 @@ import.without.aggregate$target <- as.character(import.without.aggregate$Commodi
 ##
 
 ## UI Function
-
 ui<- navbarPage(
   
   ##link to css.file
@@ -551,8 +577,8 @@ ui<- navbarPage(
                sidebarPanel(
                  selectInput(inputId = "exchange_commodity",
                              label  = "choose the commodity",
-                             choices = c('Annual Aggregate','Chocolate', 'Coffee','COCOA','Spices','Tea'),
-                             selected ='SPICES'),
+                             choices = unique(import$Commodity_Name),
+                             selected ='Spices'),
                  selectInput(inputId = "exchange_country",
                              label  = "choose the country",
                              choices = unique(import$Country),
@@ -563,12 +589,53 @@ ui<- navbarPage(
                  plotOutput("linear_exchange")
                )
              )
+             
+             ),
+             tabPanel("Regional statistics",sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "Regional_commodity",
+                             label  = "choose the commodity",
+                             choices = unique(input_data$Commodity_Name),
+                             selected ='Spices'),
+                 sliderInput(inputId = "Regional_year",
+                             label = "Select a year",
+                             value = 2016, min =1996, max =2016)
+               ),
+               
+               mainPanel(
+                 plotOutput("regional_import")
+               )
+             )
+             )
   ),
   ## end Summary Statistics tab
   
+  ## Clustering tab
+  
+  tabPanel("Clustering Analysis",
+           titlePanel("Clustering Analysis"),
+           sidebarLayout(
+             sidebarPanel(
+               radioButtons(inputId = "type",
+                            label  = "Choose import/export",
+                            choices = c('Export','Import'),
+                            selected ='Export'),
+               sliderInput(inputId = "number_clusters",
+                           label = "Number of Clusters",
+                           value = 5,min = 2,max = 20),
+               width = 3
+             ),
+             mainPanel(
+               plotlyOutput("cluster", width = "100%", height = "400px"),
+               verbatimTextOutput("click")
+             )
+           )
+           
+  ),
+  ## end Clustering tab
+  
   tabPanel("More")
 )
-
 
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
@@ -718,6 +785,17 @@ server<- function(input, output){
     text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
   })
   ##end exchange rate
+  
+  ##regional analysis
+  output$regional_import <- renderPlot({
+    title <- paste(input$Regional_year, input$Regional_commodity, "import",sep = " ")
+    temp <- filter(input_data, input_data$Year == input$Regional_year ,
+                   input_data$type == "Import",
+                   input_data$Commodity_Name == input$Regional_commodity)
+    temp_1<-aggregate(value ~ Continent, temp, sum)
+    pie(temp_1$value, labels = temp_1$Continent, main = title)
+  })
+  ##
 }
 
 
