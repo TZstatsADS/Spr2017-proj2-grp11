@@ -206,20 +206,32 @@ ui<- navbarPage(
              ),
              ### end Mirror Histogram
              
-             ### Regional statistics
-             tabPanel("Regional statistics",sidebarLayout(
+             tabPanel("Continent statistics",sidebarLayout(
                sidebarPanel(
-                 selectInput(inputId = "Regional_commodity",
+                 selectInput(inputId = "continent_commodity",
                              label  = "choose the commodity",
                              choices = unique(input_data$Commodity_Name),
                              selected ='Spices'),
-                 sliderInput(inputId = "Regional_year",
+                 sliderInput(inputId = "continent_year",
                              label = "Select a year",
-                             value = 2016, min =1996, max =2016)
+                             value = 2000, min =1996, max =2016)
                ),
                
                mainPanel(
-                 plotOutput("regional_import")
+                 plotOutput("continent_import")
+               )
+             )
+             ),
+             tabPanel("Regional statistics",sidebarLayout(
+               sidebarPanel(
+                 selectInput(inputId = "regional_commodity",
+                             label  = "choose the commodity",
+                             choices = unique(input_data$Commodity_Name),
+                             selected ='Spices')
+               ),
+               
+               mainPanel(
+                 plotlyOutput("regional_import")
                )
              )
              )
@@ -440,14 +452,32 @@ server<- function(input, output){
   })
   ## end Mirror Histogram
   
-  ##regional analysis
-  output$regional_import <- renderPlot({
-    title <- paste(input$Regional_year, input$Regional_commodity, "import",sep = " ")
-    temp <- filter(input_data, input_data$Year == input$Regional_year ,
+  ##continent analysis
+  output$continent_import <- renderPlot({
+    title <- paste(input$continent_year, input$continent_commodity, "import",sep = " ")
+    temp <- filter(input_data, input_data$Year == input$continent_year ,
                    input_data$type == "Import",
-                   input_data$Commodity_Name == input$Regional_commodity)
+                   input_data$Commodity_Name == input$continent_commodity)
     temp_1<-aggregate(value ~ Continent, temp, sum)
     pie(temp_1$value, labels = temp_1$Continent,  main = title)
+  })
+  ##
+  
+  ##Regional analysis
+  output$regional_import <- renderPlotly({
+    temp <- filter(input_data ,
+                   input_data$type == "Import",
+                   input_data$Commodity_Name == input$regional_commodity)
+    
+    p <- plot_ly()
+    
+    for (i in  unique (temp$Region)){
+      temp_1 <- filter(temp , temp$Region ==i)
+      temp_1 <- group_by(temp_1,Year)%>% summarise(value = sum(value))
+      p <- add_trace(p, x = temp_1$Year, y = temp_1$value, mode = "lines+markers", name = i)
+      
+    }
+    p
   })
   ##
   
