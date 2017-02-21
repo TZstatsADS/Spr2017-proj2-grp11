@@ -25,7 +25,6 @@ output$Hist <- renderPlot({
 tp = input_data
 tp = subset(tp,Country == as.character(input$country_hist))
 tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
-tp = na.omit(tp)
 tp = tp[order(tp$type,decreasing = T),]#put import first
 
 ##Data frame for ggplot2
