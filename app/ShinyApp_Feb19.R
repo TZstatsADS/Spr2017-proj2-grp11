@@ -488,6 +488,7 @@ server<- function(input, output){
   
   ##continent analysis
   output$continent_import <- renderPlot({
+    input_data$value<-as.numeric(input_data$value)
     title <- paste(input$continent_year, input$continent_commodity, "import",sep = " ")
     temp <- filter(input_data, input_data$Year == input$continent_year ,
                    input_data$type == "Import",
