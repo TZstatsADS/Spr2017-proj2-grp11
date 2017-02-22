@@ -67,6 +67,7 @@ input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
 #create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
 input_data$log = ceiling(log(input_data$value)/3)-2
+input_data$value=as.numeric(input_data$value)
 #Load the data for Google motion data
 country<-read.csv("../data/country_cleaned.csv")
 ## end preprocess data
@@ -233,7 +234,7 @@ ui<- navbarPage(
                sidebarPanel(
                  selectInput(inputId = "continent_commodity",
                              label  = "choose the commodity",
-                             choices = unique(input_data$Commodity_Name),
+                             choices = na.omit(unique(input_data$Commodity_Name)),
                              selected ='Spices'),
                  sliderInput(inputId = "continent_year",
                              label = "Select a year",
@@ -249,7 +250,7 @@ ui<- navbarPage(
                sidebarPanel(
                  selectInput(inputId = "regional_commodity",
                              label  = "choose the commodity",
-                             choices = unique(input_data$Commodity_Name),
+                             choices = na.omit(unique(input_data$Commodity_Name)),
                              selected ='Spices')
                ),
                
