@@ -24,7 +24,8 @@ packages.used <-
     "dplyr",
     "plotly",
     "RColorBrewer",
-    "treemap"
+    "treemap",
+    "gplots"
   )
 
 # check packages that need to be installed.
@@ -37,6 +38,7 @@ if(length(packages.needed)>0){
 }
 
 #load the packages
+library("gplots")
 library("plyr")
 library("dplyr")
 library("reshape2")
@@ -219,16 +221,22 @@ ui<- navbarPage(
                                       label  = "Select the commodity",
                                       choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
                                       selected ='Tea'),
-                          selectInput(inputId = "country_hist",
-                                      label  = "Select the country",
+                          selectInput(inputId = "country_hist1",
+                                      label  = "Select the country1",
+                                      choices = sort(unique(input_data$Country)),
+                                      selected ='Canada'),
+                          selectInput(inputId = "country_hist2",
+                                      label  = "Select the country2",
                                       choices = sort(unique(input_data$Country)),
                                       selected ='Canada')
                         ),
                         
                         mainPanel(
-                          plotOutput("Hist")
+                          plotOutput("Hist1"),
+                          plotOutput("Hist2")
                         )
                       )
+                      
                       
              ),
              ### end Mirror Histogram
@@ -461,32 +469,84 @@ server<- function(input, output){
     title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
     temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
                    import$Country == input$exchange_country)
-    plot(temp$rate,temp$value, main = title,
-         xlab="exchange rate", ylab="yearly import")
-    text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
+    dat = data.frame(rate = temp$rate,value = temp$value,year = temp$Year)
+    ggplot(dat, aes(x=rate, y=value)) + geom_point(shape=1)+
+      ggtitle(title)+
+      theme(plot.title = element_text(lineheight=3, face="bold", color="black", size=29))+
+      xlab("Exchange rate")+
+      ylab("yearly import")+
+      theme(axis.title.y = element_text(size = rel(1.8), angle = 0))+
+      theme(axis.title.x = element_text(size = rel(1.8), angle = 0))+
+      geom_smooth(method=lm)
+#      +
+#    geom_text(aes(x=rate, y=value, label=year, fill=1))
   })
   ##end exchange rate
   
   ## Mirror Histogram
-  output$Hist <- renderPlot({
+  #####First Histogram
+  output$Hist1 <- renderPlot({
     ##Subset
     tp = input_data
-    tp = subset(tp,Country == as.character(input$country_hist))
+    tp = subset(tp,Country == as.character(input$country_hist1))
     tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
     tp = tp[order(tp$type,decreasing = T),]#put import first
     Rate = exchange_rate
-    Rate = subset(Rate,Country.Name == as.character(input$country_hist))
+    Rate = subset(Rate,Country.Name == as.character(input$country_hist1))
     ##Data frame for ggplot2
-    dat <- data.frame(
+    dat1 <- data.frame(
       group = tp$type,
       Year = tp$Year,
       Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
     )
     
-    library(grid)
-    plot1  = ggplot(dat, aes(x=Year, y=Value, fill=group))+
+    #### Plotting
+    plot1  = ggplot(dat1, aes(x=Year, y=Value, fill=group))+
       geom_bar(stat="identity", position="identity")+
-      scale_fill_manual(values=c("#87CEFA","#DC143C"))
+      scale_fill_manual(values=c("#87CEFA","#DC143C"))+
+      coord_cartesian(xlim=c(1996, 2016))
+    if(length(Rate$rate)){
+      plot2 = ggplot(Rate,aes(x = year,y = rate))+
+        geom_line(color = "Black")+
+        coord_cartesian(ylim=c(0, max(Rate$rate)))+
+        ylab("Exchange rate")
+    }
+    else if(length(Rate$rate) == 0){
+      empty <- data.frame(
+        year = 1996,
+        rate = 0)
+      plot2 = ggplot(empty,aes(x = year,y = rate))
+    }
+    
+    plot1 <- plot1 + theme_bw() + theme(legend.position="top")
+    plot2 <- plot2 + theme_bw() + theme(panel.grid=element_blank()) +
+      theme(panel.background = element_rect(fill = NA))
+    #plot the exchange rate line on the histogram
+    #with 2 different y-axis
+    #use self-written function"double_axis_graph
+    plot(double_axis_graph(plot1,plot2))
+  })
+  
+  ######Second Histogram
+  output$Hist2 <- renderPlot({
+    ##Subset
+    tp = input_data
+    tp = subset(tp,Country == as.character(input$country_hist2))
+    tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
+    tp = tp[order(tp$type,decreasing = T),]#put import first
+    Rate = exchange_rate
+    Rate = subset(Rate,Country.Name == as.character(input$country_hist2))
+    ##Data frame for ggplot2
+    dat2 <- data.frame(
+      group = tp$type,
+      Year = tp$Year,
+      Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
+    )
+    ######## plotting
+    plot1  = ggplot(dat2, aes(x=Year, y=Value, fill=group))+
+      geom_bar(stat="identity", position="identity")+
+      scale_fill_manual(values=c("#87CEFA","#DC143C"))+
+      coord_cartesian(xlim=c(1996, 2016))
     if(length(Rate$rate)){
       plot2 = ggplot(Rate,aes(x = year,y = rate))+
         geom_line(color = "Black")+
