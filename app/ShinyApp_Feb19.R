@@ -470,13 +470,16 @@ server<- function(input, output){
     temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
                    import$Country == input$exchange_country)
     dat = data.frame(rate = temp$rate,value = temp$value,year = temp$Year)
-    ggplot(dat, aes(x=rate, y=value)) + geom_point(shape=1)+
+    ggplot(dat, aes(x=rate, y=value)) +
+      geom_point(aes(colour = value)) + 
+      scale_colour_gradient(low = "blue")+
+      aes(size = value)+
       ggtitle(title)+
-      theme(plot.title = element_text(lineheight=3, face="bold", color="black", size=29))+
+      theme(plot.title = element_text(lineheight=3, face="bold", color = "#666666", size=24,hjust = 1))+
       xlab("Exchange rate")+
       ylab("yearly import")+
-      theme(axis.title.y = element_text(size = rel(1.8), angle = 0))+
-      theme(axis.title.x = element_text(size = rel(1.8), angle = 0))+
+      theme(axis.title.y = element_text(color = "#666666",size = rel(1.8), angle = 0))+
+      theme(axis.title.x = element_text(color = "#666666",size = rel(1.8), angle = 0))+
       geom_smooth(method=lm)
 #      +
 #    geom_text(aes(x=rate, y=value, label=year, fill=1))
