@@ -415,7 +415,7 @@ server<- function(input, output){
                  popup=~Country,icon = ~Icon)%>%  
       setView(lng=-30,lat=28,zoom=3)%>%#put US in the centre
       addLegend("bottomright", colors = Colors, labels = Labels,
-                title = "Value From Large to Small",
+                title = "Value Level From Small to Large",
                 labFormat = labelFormat(prefix = "$"),
                 opacity = 1)
   })
