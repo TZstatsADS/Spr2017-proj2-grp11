@@ -28,11 +28,12 @@ Aggregate = data.frame(Year = Aggregate$Year,SITC = 70,Commodity_Name = "Annual 
 input = rbind(input,Aggregate)
 
 #load the longitude and latitude of the countries in the world
-library(maptools)
-data("wrld_simpl")
-long_lat = data.frame(Country = wrld_simpl$NAME,
-                      longitude = wrld_simpl$LON,
-                      latitude = wrld_simpl$LAT)
+country = data.frame(Country = unique(input$Country))
+location = apply(country,1,geocode)
+location = matrix(unlist(location),ncol = 2,byrow = T)
+long_lat = data.frame(Country = country,
+                      longitude = as.numeric(location[,1]),
+                      latitude = as.numeric(location[,2]))
 #match the long and lat we want
 Match.flora <- function(input_data){
   tmp = match(input_data[4],long_lat$Country)
@@ -45,14 +46,24 @@ names(input)[7:8] = c("longitude","latitude")
 #adding US and its longitude, latitude
 US = data.frame(To = rep("US",nrow(input)),US.longitude = -95.71289,US.latitude = 37.09024)
 input = cbind(input,US)
-mydata = data.frame(Year = input$Year,Country = input$Country,longitude = input$longitude,
-           latitude = input$latitude,type = input$trade_type,value = input$value,
-           To = input$To,US.longitude = input$US.longitude,US.latitude = input$US.latitude,
-           Commodity_Name = input$Commodity_Name)
+mydata = data.frame(Year = input$Year,Country = input$Country,
+                    longitude =input$longitude,
+                    latitude = input$latitude,
+                    type = input$trade_type,
+                    value = input$value,
+                    To = input$To,
+                    US.longitude = input$US.longitude,
+                    US.latitude = input$US.latitude,
+                    Commodity_Name = input$Commodity_Name)
+#manually adding the only country which geocode function cannot locate
+mydata$longitude[mydata$Country=="British Virgin Islands"] <- -64.64
+mydata$latitude[mydata$Country=="British Virgin Islands"] <- 18.4207
+
 ```
 
 ```{r}
 #save the result for visualization
-write.csv(mydata,"../data/mydata.csv",row.names = F)
+setwd("F:/second_term/ADS/proj2/Spr2017-proj2-grp11-master/data")
+write.csv(mydata,"mydata.csv",row.names = F)
 ```
 
