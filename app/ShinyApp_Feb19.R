@@ -541,6 +541,7 @@ server<- function(input, output){
   
   ## Cluster visuals
   output$cluster <- renderPlotly({
+    set.seed(1)
     k = input$number_clusters
     newcountry<-country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
@@ -581,6 +582,7 @@ server<- function(input, output){
   })
   
   output$mytable<-renderDataTable({
+    set.seed(1)
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
