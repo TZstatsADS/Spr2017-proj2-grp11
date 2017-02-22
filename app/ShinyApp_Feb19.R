@@ -174,8 +174,11 @@ ui<- navbarPage(
                                       label  = "Select the commodity",
                                       choices = c('Chocolate', 'Coffee','Cocoa','Spices','Tea'),
                                       selected ='Coffee'),
-                          width = 3
-                        ),
+                         sliderInput(
+                            inputId = "year_tree",
+                            label = "Select a year",
+                            value = 1996, min =1996, max =2016)),
+                        
                         mainPanel(
                           plotOutput("treemap",width = "100%", height = 600)
                         )
