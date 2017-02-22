@@ -571,18 +571,23 @@ server<- function(input, output){
   output$text_2<- renderText({
     "Average and number of countries in each cluster as follows:"
   })
+  
   output$mytable<-renderDataTable({
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
     newcountry1<-newcountry[,3:7]
     cls_result<-kmeans(newcountry1,k)
-    table2<-cls_result$centers
+    
+    newcountry$cluster = cls_result$cluster
+    by_clust = group_by(newcountry,cluster)
+    by_clust = as.data.frame(summarise(by_clust, mean(Coffee),mean(Tea), mean(Spices), mean(Chocolate), mean(Cocoa)))
+    table2<-cbind(data.frame(Cluster = 1:k),data.frame(Size = cls_result$size),by_clust[,2:6])
     table2<-round(table2,0)
     #create row names for "table2"
     name_table2<-c()
     for(i in 1:nrow(table2)){
-      name_table2<-c(name_table2,paste("cluster center",i,sep = " "))
+      name_table2<-c(name_table2,paste("cluster means",i,sep = " "))
     }
     rownames(table2)=name_table2
     table2
