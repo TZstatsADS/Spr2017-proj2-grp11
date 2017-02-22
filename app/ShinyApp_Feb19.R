@@ -107,8 +107,11 @@ ui<- navbarPage(
   ## 3D Globe tab
   tabPanel("3D Globe",
            titlePanel("Coffee ,tea, and others traded between US and the world"),
-           sidebarLayout(
-             sidebarPanel(
+           absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                         draggable = TRUE, 
+                         top = 150, left = 20, right = "auto", bottom = "auto",
+                         width = 300, height = "auto",
+                         
                radioButtons(inputId = "type",
                             label  = "Choose import/export",
                             choices = c('Export','Import'),
@@ -122,15 +125,17 @@ ui<- navbarPage(
                selectInput(inputId = "commodity_3D",
                            label  = "Select the commodity",
                            choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                           selected ='Coffee'),
-               width = 3
-             ),
-             mainPanel(
-               globeOutput("Globe",width="100%",height="600px"),
-               plotOutput("ggplot",width="100%",height="200px")
-             )
-           )
-  ),
+                           selected ='Coffee')),
+           absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                         draggable = TRUE, 
+                         top = 200, left = "auto", right = 20, bottom = "auto",
+                         width = 330, height = "auto",
+                         
+                         plotOutput("ggplot",width="100%",height="200px")
+                         ),
+            
+              globeOutput("Globe",width="100%",height="600px"))
+           ,
   ## end 3D Globe tab
   
   ## 2D Map tab
@@ -381,8 +386,13 @@ server<- function(input, output){
     clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     ##### end subset
     
-    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
-    g
+    g = ggplot(data = temp, aes(x = Country, y = value))+
+      geom_bar(stat='identity',position = "dodge")+
+               theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white")) +
+      theme(legend.position="none") + 
+      theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
+    g+
+      coord_flip()
     
   })
   ## end ggplot
@@ -433,8 +443,8 @@ server<- function(input, output){
       addMarkers(data = US, 
                  popup=~Country,icon = ~Icon)%>%  
       setView(lng=-30,lat=28,zoom=2)%>%#put US in the centre
-      addLegend("bottomright", colors = Colors, labels = Labels,
-                title = "Value Level From Small to Large",
+      addLegend("topright", colors = Colors, labels = Labels,
+                title = "Trade Level<br/>From Small to Large",
                 labFormat = labelFormat(prefix = "$"),
                 opacity = 1)
   })
