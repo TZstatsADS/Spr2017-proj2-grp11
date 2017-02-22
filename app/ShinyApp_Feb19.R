@@ -65,9 +65,7 @@ source("../lib/double-axis.R")
 input_data =  read.csv("../data/mydata_wRegions.csv",header = T,as.is = T)
 input_data = input_data[!is.na(input_data$longitude),]
 input_data = input_data[input_data$value != 0,]
-#create 6 level for value data whose magnitude ranges from 1e3 tp 1e8
-input_data$log = ceiling(log(input_data$value)/3)-2
-input_data$value=as.numeric(input_data$value)
+input_data[!is.na(input_data$Commodity_Name) & input_data$Commodity_Name == "COCOA",10] = "Cocoa"
 #Load the data for Google motion data
 country<-read.csv("../data/country_cleaned.csv")
 # force all values in country dataset to be numeric
@@ -114,7 +112,7 @@ ui<- navbarPage(
                             selected ='Export'),
                sliderInput(inputId = "year_3D",
                            label = "Select a year",
-                           value = 1996, min =1996, max =2016),
+                           value = 2016, min =1996, max =2016),
                sliderInput(inputId = "number_countries",
                            label = "Top Countries in Trade",
                            value = 10,min = 1,max = 50),
@@ -146,7 +144,7 @@ ui<- navbarPage(
                            value = 2016, min =1996, max =2016),
                sliderInput(inputId = "num_countries",
                            label = "Top Countries in Trade",
-                           value = 30,min = 1,max = 50),
+                           value = 10,min = 1,max = 50),
                selectInput(inputId = "commodity_2D",
                            label  = "Select the commodity",
                            choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
@@ -299,7 +297,7 @@ ui<- navbarPage(
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
 bgcolor = "#000000"
-arc_colors = c("#998080","#809980","#808099","#999980","#809999","#998099")
+arc_colors = c("red","blue","green","#ffe9bf","pink","orange")
 map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
@@ -350,7 +348,7 @@ server<- function(input, output){
             arcsHeight=0.35, 
             arcsLwd=2, 
             arcsColor = arc_colors[index], 
-            arcsOpacity=1,
+            arcsOpacity=0.5,
             atmosphere=TRUE, height=600, width = 600
     )
   })
@@ -403,9 +401,13 @@ server<- function(input, output){
     tmp = subset(tmp,Commodity_Name == as.character(input$commodity_2D))
     tmp = subset(tmp,Year == as.integer(input$year_2D))
     tmp = subset(tmp,type == as.character(input$type_2D))
-    tmp = arrange(tmp,desc(value))[1:input$num_countries,]
+    tmp = arrange(tmp,desc(value))[1:50,]
+    min = min(tmp$value, na.rm = TRUE)
+    tmp = tmp[1:input$num_countries,]
     rank = 1:nrow(tmp)
-    Log = paste("level",ceiling(log(tmp$value)/2)-3,sep = "")
+    max = max(tmp$value, na.rm = TRUE)
+
+    Log = paste("level",floor(log((tmp$value) - min + 1, base =1.0001)/log(max - min + 1, base =1.0001) * 7 + 1),sep = "")
     tmp$rank = paste(tmp$Country,"<br/>",
                      "ranks No.",rank,"<br/>",
                      "Annual Trade Value: $",tmp$value,"<br/>",sep = "",
@@ -420,7 +422,7 @@ server<- function(input, output){
       addMarkers(popup=~rank,icon = ~levelIcon[Log])%>%
       addMarkers(data = US, 
                  popup=~Country,icon = ~Icon)%>%  
-      setView(lng=-30,lat=28,zoom=3)%>%#put US in the centre
+      setView(lng=-30,lat=28,zoom=2)%>%#put US in the centre
       addLegend("bottomright", colors = Colors, labels = Labels,
                 title = "Value Level From Small to Large",
                 labFormat = labelFormat(prefix = "$"),
