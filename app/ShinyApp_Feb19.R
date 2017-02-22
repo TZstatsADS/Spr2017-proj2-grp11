@@ -283,6 +283,8 @@ ui<- navbarPage(
              
              mainPanel(
                plotlyOutput("cluster", width = "100%", height = "400px"),
+               textOutput("text_1"),
+               textOutput("text_2"),
                dataTableOutput("mytable")
              )
            )
@@ -563,6 +565,12 @@ server<- function(input, output){
      
   })
   
+  output$text_1<- renderText({
+    "Click on a state to view cluster result" 
+  })
+  output$text_2<- renderText({
+    "Average and number of countries in each cluster as follows:"
+  })
   output$mytable<-renderDataTable({
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
