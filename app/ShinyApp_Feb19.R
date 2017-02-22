@@ -273,7 +273,7 @@ ui<- navbarPage(
                
                sliderInput(inputId = "number_clusters",
                            label = "Number of Clusters",
-                           value = 5,min = 2,max = 20),
+                           value = 5,min = 2,max = 10),
                sliderInput(
                  inputId = "year_cluster",
                  label = "Select a year",
@@ -554,13 +554,13 @@ server<- function(input, output){
     plot_geo(df) %>%
       add_trace(
         z = ~clusters, color = ~clusters, colors = brewer.pal(k, "RdYlGn"), type = "scatter", 
-        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l')
+        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l'), showlegend = FALSE
       ) %>%
-      colorbar(title = 'Cluster number', tickprefix = '') %>%
       layout(
         title = paste(k,"clusters for all countries concerning","Import",sep=" "),
         geo = g
-      )
+      ) %>%
+      hide_colorbar()
      
   })
   
@@ -569,11 +569,9 @@ server<- function(input, output){
     if (is.null(d)) "Click on a state to view cluster result \nCluster centers are as follows" else d
     
   })
-  
-  
   output$mytable<-renderDataTable({
     k=input$number_clusters
-    newcountry<-country[country$Year==input$year_cluster,]
+    newcountry <- country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
     newcountry1<-newcountry[,3:7]
     cls_result<-kmeans(newcountry1,k)
