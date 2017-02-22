@@ -571,6 +571,9 @@ server<- function(input, output){
   
   output$mytable<-renderDataTable({
     k=input$number_clusters
+    newcountry<-country[country$Year==input$year_cluster,]
+    #choose the five columns with different commodity values
+    newcountry1<-newcountry[,3:7]
     cls_result<-kmeans(newcountry1,k)
     table2<-cls_result$centers
     table2<-round(table2,0)
