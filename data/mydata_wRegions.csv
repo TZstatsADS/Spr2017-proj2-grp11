@@ -5860,7 +5860,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2007,Cyprus,33.429859,35.126413,Export,120039,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Lebanon,35.862285,33.854721,Export,140118,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Israel,34.851612,31.046051,Export,3540283,US,-95.71289,37.09024,Chocolate,West Asia,Asia
-2007,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Chocolate,West Asia,Asia
+2007,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Jordan,36.238414,30.585164,Export,450205,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Kuwait,47.481766,29.31166,Export,680160,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Saudi Arabia,45.079162,23.885942,Export,5227045,US,-95.71289,37.09024,Chocolate,West Asia,Asia
@@ -11104,7 +11104,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2008,Lebanon,35.862285,33.854721,Export,130562,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Iran,53.688046,32.427908,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Israel,34.851612,31.046051,Export,1111824,US,-95.71289,37.09024,Spices,West Asia,Asia
-2008,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2008,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Jordan,36.238414,30.585164,Export,388158,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Kuwait,47.481766,29.31166,Export,678697,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Saudi Arabia,45.079162,23.885942,Export,1293956,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -11238,7 +11238,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2009,Lebanon,35.862285,33.854721,Export,186870,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Iran,53.688046,32.427908,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Israel,34.851612,31.046051,Export,528829,US,-95.71289,37.09024,Spices,West Asia,Asia
-2009,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2009,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Jordan,36.238414,30.585164,Export,244158,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Kuwait,47.481766,29.31166,Export,825816,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Saudi Arabia,45.079162,23.885942,Export,1773169,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -11376,7 +11376,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2010,Iraq,43.679291,33.223191,Export,7589,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Iran,53.688046,32.427908,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Israel,34.851612,31.046051,Export,928633,US,-95.71289,37.09024,Spices,West Asia,Asia
-2010,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2010,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Jordan,36.238414,30.585164,Export,380033,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Kuwait,47.481766,29.31166,Export,694851,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Saudi Arabia,45.079162,23.885942,Export,2900880,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -11514,7 +11514,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2011,Lebanon,35.862285,33.854721,Export,59845,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Iraq,43.679291,33.223191,Export,5879,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Israel,34.851612,31.046051,Export,396487,US,-95.71289,37.09024,Spices,West Asia,Asia
-2011,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2011,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Jordan,36.238414,30.585164,Export,318845,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Kuwait,47.481766,29.31166,Export,462551,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Saudi Arabia,45.079162,23.885942,Export,4083413,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -11656,7 +11656,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2012,Syria,38.996815,34.802075,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Lebanon,35.862285,33.854721,Export,151323,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Israel,34.851612,31.046051,Export,144979,US,-95.71289,37.09024,Spices,West Asia,Asia
-2012,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2012,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Jordan,36.238414,30.585164,Export,395210,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Kuwait,47.481766,29.31166,Export,392015,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Saudi Arabia,45.079162,23.885942,Export,3418882,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -11792,7 +11792,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2013,Syria,38.996815,34.802075,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Lebanon,35.862285,33.854721,Export,42481,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Israel,34.851612,31.046051,Export,269724,US,-95.71289,37.09024,Spices,West Asia,Asia
-2013,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2013,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Jordan,36.238414,30.585164,Export,641292,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Kuwait,47.481766,29.31166,Export,357441,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Saudi Arabia,45.079162,23.885942,Export,3587108,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -11935,7 +11935,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2014,Lebanon,35.862285,33.854721,Export,70103,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Iraq,43.679291,33.223191,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Israel,34.851612,31.046051,Export,220651,US,-95.71289,37.09024,Spices,West Asia,Asia
-2014,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2014,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Jordan,36.238414,30.585164,Export,699074,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Kuwait,47.481766,29.31166,Export,394964,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Saudi Arabia,45.079162,23.885942,Export,4019615,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -12079,7 +12079,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2015,Lebanon,35.862285,33.854721,Export,129661,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Iraq,43.679291,33.223191,Export,104261,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Israel,34.851612,31.046051,Export,343036,US,-95.71289,37.09024,Spices,West Asia,Asia
-2015,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2015,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Jordan,36.238414,30.585164,Export,522993,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Kuwait,47.481766,29.31166,Export,581641,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Saudi Arabia,45.079162,23.885942,Export,4465381,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -12222,7 +12222,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2016,Iraq,43.679291,33.223191,Export,176253,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Iran,53.688046,32.427908,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Israel,34.851612,31.046051,Export,200788,US,-95.71289,37.09024,Spices,West Asia,Asia
-2016,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
+2016,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Jordan,36.238414,30.585164,Export,485272,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Kuwait,47.481766,29.31166,Export,555315,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Saudi Arabia,45.079162,23.885942,Export,6793137,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -18147,7 +18147,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2007,Cyprus,33.429859,35.126413,Import,0,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Lebanon,35.862285,33.854721,Import,719069,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Israel,34.851612,31.046051,Import,7323781,US,-95.71289,37.09024,Chocolate,West Asia,Asia
-2007,West Bank Administered by Israel,NA,NA,Import,8506,US,-95.71289,37.09024,Chocolate,West Asia,Asia
+2007,West Bank Administered by Israel,35.3833,32,Import,8506,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Jordan,36.238414,30.585164,Import,0,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Chocolate,West Asia,Asia
 2007,Saudi Arabia,45.079162,23.885942,Import,6447,US,-95.71289,37.09024,Chocolate,West Asia,Asia
@@ -23391,7 +23391,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2008,Lebanon,35.862285,33.854721,Import,316978,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Iran,53.688046,32.427908,Import,517519,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Israel,34.851612,31.046051,Import,11683782,US,-95.71289,37.09024,Spices,West Asia,Asia
-2008,West Bank Administered by Israel,NA,NA,Import,7442,US,-95.71289,37.09024,Spices,West Asia,Asia
+2008,West Bank Administered by Israel,35.3833,32,Import,7442,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Jordan,36.238414,30.585164,Import,400117,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2008,Saudi Arabia,45.079162,23.885942,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -23525,7 +23525,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2009,Lebanon,35.862285,33.854721,Import,377684,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Iran,53.688046,32.427908,Import,526124,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Israel,34.851612,31.046051,Import,6143751,US,-95.71289,37.09024,Spices,West Asia,Asia
-2009,West Bank Administered by Israel,NA,NA,Import,53975,US,-95.71289,37.09024,Spices,West Asia,Asia
+2009,West Bank Administered by Israel,35.3833,32,Import,53975,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Jordan,36.238414,30.585164,Import,380280,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2009,Saudi Arabia,45.079162,23.885942,Import,3144,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -23663,7 +23663,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2010,Iraq,43.679291,33.223191,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Iran,53.688046,32.427908,Import,700454,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Israel,34.851612,31.046051,Import,5235456,US,-95.71289,37.09024,Spices,West Asia,Asia
-2010,West Bank Administered by Israel,NA,NA,Import,6458,US,-95.71289,37.09024,Spices,West Asia,Asia
+2010,West Bank Administered by Israel,35.3833,32,Import,6458,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Jordan,36.238414,30.585164,Import,397741,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2010,Saudi Arabia,45.079162,23.885942,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -23801,7 +23801,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2011,Lebanon,35.862285,33.854721,Import,423620,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Iraq,43.679291,33.223191,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Israel,34.851612,31.046051,Import,5472602,US,-95.71289,37.09024,Spices,West Asia,Asia
-2011,West Bank Administered by Israel,NA,NA,Import,16235,US,-95.71289,37.09024,Spices,West Asia,Asia
+2011,West Bank Administered by Israel,35.3833,32,Import,16235,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Jordan,36.238414,30.585164,Import,399262,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2011,Saudi Arabia,45.079162,23.885942,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -23943,7 +23943,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2012,Syria,38.996815,34.802075,Import,7031716,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Lebanon,35.862285,33.854721,Import,596882,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Israel,34.851612,31.046051,Import,7296649,US,-95.71289,37.09024,Spices,West Asia,Asia
-2012,West Bank Administered by Israel,NA,NA,Import,32253,US,-95.71289,37.09024,Spices,West Asia,Asia
+2012,West Bank Administered by Israel,35.3833,32,Import,32253,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Jordan,36.238414,30.585164,Import,582475,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2012,Saudi Arabia,45.079162,23.885942,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -24079,7 +24079,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2013,Syria,38.996815,34.802075,Import,4469534,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Lebanon,35.862285,33.854721,Import,836818,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Israel,34.851612,31.046051,Import,7702706,US,-95.71289,37.09024,Spices,West Asia,Asia
-2013,West Bank Administered by Israel,NA,NA,Import,49942,US,-95.71289,37.09024,Spices,West Asia,Asia
+2013,West Bank Administered by Israel,35.3833,32,Import,49942,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Jordan,36.238414,30.585164,Import,552748,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2013,Saudi Arabia,45.079162,23.885942,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -24222,7 +24222,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2014,Lebanon,35.862285,33.854721,Import,1020360,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Iraq,43.679291,33.223191,Import,15264,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Israel,34.851612,31.046051,Import,7889261,US,-95.71289,37.09024,Spices,West Asia,Asia
-2014,West Bank Administered by Israel,NA,NA,Import,79667,US,-95.71289,37.09024,Spices,West Asia,Asia
+2014,West Bank Administered by Israel,35.3833,32,Import,79667,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Jordan,36.238414,30.585164,Import,754398,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2014,Saudi Arabia,45.079162,23.885942,Import,26556,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -24366,7 +24366,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2015,Lebanon,35.862285,33.854721,Import,828832,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Iraq,43.679291,33.223191,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Israel,34.851612,31.046051,Import,4555775,US,-95.71289,37.09024,Spices,West Asia,Asia
-2015,West Bank Administered by Israel,NA,NA,Import,95258,US,-95.71289,37.09024,Spices,West Asia,Asia
+2015,West Bank Administered by Israel,35.3833,32,Import,95258,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Jordan,36.238414,30.585164,Import,874688,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2015,Saudi Arabia,45.079162,23.885942,Import,6244,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -24509,7 +24509,7 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2016,Iraq,43.679291,33.223191,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Iran,53.688046,32.427908,Import,388130,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Israel,34.851612,31.046051,Import,3462863,US,-95.71289,37.09024,Spices,West Asia,Asia
-2016,West Bank Administered by Israel,NA,NA,Import,47988,US,-95.71289,37.09024,Spices,West Asia,Asia
+2016,West Bank Administered by Israel,35.3833,32,Import,47988,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Jordan,36.238414,30.585164,Import,981434,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Kuwait,47.481766,29.31166,Import,0,US,-95.71289,37.09024,Spices,West Asia,Asia
 2016,Saudi Arabia,45.079162,23.885942,Import,2630,US,-95.71289,37.09024,Spices,West Asia,Asia
@@ -28114,16 +28114,16 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2015,Vietnam,108.277199,14.058324,Export,10625555,US,-95.71289,37.09024,Annual Aggregate,south East Asia,Asia
 2016,Vietnam,108.277199,14.058324,Export,17123060,US,-95.71289,37.09024,Annual Aggregate,south East Asia,Asia
 2009,Wallis and Futuna,-178.1165,-14.2938,Export,0,US,-95.71289,37.09024,Annual Aggregate,Pacific Island,Asia
-2007,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2008,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2009,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2010,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2011,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2012,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2013,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2014,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2015,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2016,West Bank Administered by Israel,NA,NA,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2007,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2008,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2009,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2010,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2011,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2012,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2013,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2014,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2015,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2016,West Bank Administered by Israel,35.3833,32,Export,0,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
 1998,Western Sahara,-12.885834,24.215527,Export,0,US,-95.71289,37.09024,Annual Aggregate,North Africa,Africa
 2012,Western Sahara,-12.885834,24.215527,Export,0,US,-95.71289,37.09024,Annual Aggregate,North Africa,Africa
 1996,Yemen,48.516388,15.552727,Export,5200,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
@@ -31730,16 +31730,16 @@ Year,Country,longitude,latitude,type,value,To,US.longitude,US.latitude,Commodity
 2015,Vietnam,108.277199,14.058324,Import,709862240,US,-95.71289,37.09024,Annual Aggregate,south East Asia,Asia
 2016,Vietnam,108.277199,14.058324,Import,892155970,US,-95.71289,37.09024,Annual Aggregate,south East Asia,Asia
 2009,Wallis and Futuna,-178.1165,-14.2938,Import,22231,US,-95.71289,37.09024,Annual Aggregate,Pacific Island,Asia
-2007,West Bank Administered by Israel,NA,NA,Import,8506,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2008,West Bank Administered by Israel,NA,NA,Import,7442,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2009,West Bank Administered by Israel,NA,NA,Import,53975,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2010,West Bank Administered by Israel,NA,NA,Import,6458,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2011,West Bank Administered by Israel,NA,NA,Import,16235,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2012,West Bank Administered by Israel,NA,NA,Import,32253,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2013,West Bank Administered by Israel,NA,NA,Import,49942,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2014,West Bank Administered by Israel,NA,NA,Import,79667,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2015,West Bank Administered by Israel,NA,NA,Import,95258,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
-2016,West Bank Administered by Israel,NA,NA,Import,47988,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2007,West Bank Administered by Israel,35.3833,32,Import,8506,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2008,West Bank Administered by Israel,35.3833,32,Import,7442,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2009,West Bank Administered by Israel,35.3833,32,Import,53975,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2010,West Bank Administered by Israel,35.3833,32,Import,6458,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2011,West Bank Administered by Israel,35.3833,32,Import,16235,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2012,West Bank Administered by Israel,35.3833,32,Import,32253,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2013,West Bank Administered by Israel,35.3833,32,Import,49942,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2014,West Bank Administered by Israel,35.3833,32,Import,79667,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2015,West Bank Administered by Israel,35.3833,32,Import,95258,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
+2016,West Bank Administered by Israel,35.3833,32,Import,47988,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
 1998,Western Sahara,-12.885834,24.215527,Import,2223,US,-95.71289,37.09024,Annual Aggregate,North Africa,Africa
 2012,Western Sahara,-12.885834,24.215527,Import,99428,US,-95.71289,37.09024,Annual Aggregate,North Africa,Africa
 1996,Yemen,48.516388,15.552727,Import,2376903,US,-95.71289,37.09024,Annual Aggregate,West Asia,Asia
