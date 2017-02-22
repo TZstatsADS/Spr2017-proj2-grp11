@@ -283,7 +283,6 @@ ui<- navbarPage(
              
              mainPanel(
                plotlyOutput("cluster", width = "100%", height = "400px"),
-               verbatimTextOutput("click"),
                dataTableOutput("mytable")
              )
            )
@@ -564,11 +563,6 @@ server<- function(input, output){
      
   })
   
-  output$click <- renderText({
-    d <- event_data("plotly_click")
-    if (is.null(d)) "Click on a state to view cluster result \nCluster centers are as follows" else d
-    
-  })
   output$mytable<-renderDataTable({
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
