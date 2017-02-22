@@ -1,4 +1,5 @@
 
+
 ## Packages
 
 packages.used <- 
@@ -541,7 +542,6 @@ server<- function(input, output){
   
   ## Cluster visuals
   output$cluster <- renderPlotly({
-    set.seed(1)
     k = input$number_clusters
     newcountry<-country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
@@ -575,14 +575,13 @@ server<- function(input, output){
   })
   
   output$text_1<- renderText({
-    "Click on a state to view cluster result" 
+    "Click on a Country to view cluster result" 
   })
   output$text_2<- renderText({
-    "Average and number of countries in each cluster as follows:"
+    "Trade Magnitude and number of countries in each cluster as follows:"
   })
   
   output$mytable<-renderDataTable({
-    set.seed(1)
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
@@ -591,9 +590,20 @@ server<- function(input, output){
     
     newcountry$cluster = cls_result$cluster
     by_clust = group_by(newcountry,cluster)
-    by_clust = as.data.frame(summarise(by_clust, mean(Coffee),mean(Tea), mean(Spices), mean(Chocolate), mean(Cocoa)))
+    by_clust = as.data.frame(summarise(by_clust, 
+                                       mean(Coffee),
+                                       mean(Tea), 
+                                       mean(Spices), 
+                                       mean(Chocolate), 
+                                       mean(Cocoa)))
+    by_clust[,2:6] = t(apply(by_clust[,2:6],1,log))
+    names(by_clust) = c("by_clust","Magitude(Of Coffee)",
+                        "Magitude(Of Tea)",
+                        "Magitude(Of Spices)",
+                        "Magitude(Of Chocolate)",
+                        "Magitude(Of Cocoa)") 
     table2<-cbind(data.frame(Cluster = 1:k),data.frame(Size = cls_result$size),by_clust[,2:6])
-    table2<-round(table2,0)
+    table2<-round(table2,1)
     #create row names for "table2"
     name_table2<-c()
     for(i in 1:nrow(table2)){
