@@ -425,7 +425,7 @@ server<- function(input, output){
   ## MotionChart
   output$view <- renderGvis({
     
-    gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee', options=list(width="800", height="800"))
+    gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee',colorvar = 'Coffee', options=list(width="800", height="800"))
   })
   ## end MotionChart
   
