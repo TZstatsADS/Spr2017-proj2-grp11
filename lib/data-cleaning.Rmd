@@ -55,9 +55,11 @@ mydata = data.frame(Year = input$Year,Country = input$Country,
                     US.longitude = input$US.longitude,
                     US.latitude = input$US.latitude,
                     Commodity_Name = input$Commodity_Name)
-#manually adding the only country which geocode function cannot locate
+#manually adding the only 2 country which geocode function cannot locate
 mydata$longitude[mydata$Country=="British Virgin Islands"] <- -64.64
 mydata$latitude[mydata$Country=="British Virgin Islands"] <- 18.4207
+mydata$longitude[mydata$Country == "West Bank Administered by Israel"] = 35.3833
+mydata$latitude[mydata$Country == "West Bank Administered by Israel"] = 32.0
 
 ```
 
