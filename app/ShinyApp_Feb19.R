@@ -272,18 +272,21 @@ ui<- navbarPage(
            titlePanel("Clustering Analysis"),
            sidebarLayout(
              sidebarPanel(
-               radioButtons(inputId = "type",
-                            label  = "Choose import/export",
-                            choices = c('Export','Import'),
-                            selected ='Export'),
+               
                sliderInput(inputId = "number_clusters",
                            label = "Number of Clusters",
                            value = 5,min = 2,max = 20),
-               width = 3
+               sliderInput(
+                 inputId = "year_cluster",
+                 label = "Select a year",
+                 value = 1996, min =1996, max =2016)
+               
              ),
+             
              mainPanel(
                plotlyOutput("cluster", width = "100%", height = "400px"),
-               verbatimTextOutput("click")
+               verbatimTextOutput("click"),
+               dataTableOutput("mytable")
              )
            )
   
@@ -439,7 +442,13 @@ server<- function(input, output){
     #selcet a year and a one of the five categories
     sub_country<-country[country$Year==input$year_tree,]
     sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
-    treemap(sub_country, index='Country', vSize=input$com_tree, vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
+    sub_country[nrow(sub_country)+1,3:7]<-colSums(sub_country[,3:7])
+    for(i in 3:7){
+      sub_country[,i]<-sub_country[,i]/sub_country[nrow(sub_country),i]
+    }
+    sub_country<-sub_country[1:nrow(sub_country)-1,]
+    sub_country$label<-paste(sub_country$Country,", ",round(100*sub_country[,as.character(input$com_tree)]),"%",sep="")
+    treemap(sub_country, index='label', vSize=input$com_tree, vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
   })
   ## end Tree Map
   
@@ -521,13 +530,18 @@ server<- function(input, output){
   
   ## Cluster visuals
   output$cluster <- renderPlotly({
-    
     k = input$number_clusters
-    clusters = kmeans(t(cluster_data_import[,3:dim(cluster_data_import)[2]]),k)$cluster
+    newcountry<-country[country$Year==input$year_cluster,]
+    #choose the five columns with different commodity values
+    newcountry1<-newcountry[,3:7]
+    #store the result of kmeans cluster in "cls_result"
+    cls_result<-kmeans(newcountry1,k)
+    clusters<-cls_result$cluster
     df = as.data.frame(clusters)
-    df$COUNTRY = rownames(df)
+    df$COUNTRY = newcountry[,2]
     df = merge(x = df, y = code, all.y = TRUE)
     df[is.na(df$clusters),2] = 0
+    ## end cluster visual
     
     g <- list(
       showframe = FALSE,
@@ -542,17 +556,32 @@ server<- function(input, output){
       ) %>%
       colorbar(title = 'Cluster number', tickprefix = '') %>%
       layout(
-        title = 'Clustering Visual',
+        title = paste(k,"clusters for all countries concerning","Import",sep=" "),
         geo = g
       )
+     
   })
   
-  output$click <- renderPrint({
+  output$click <- renderText({
     d <- event_data("plotly_click")
-    if (is.null(d)) "Click on a state to view event data" else d
+    if (is.null(d)) "Click on a state to view cluster result \nCluster centers are as follows" else d
+    
   })
-  ## end cluster visual
   
+  
+  output$mytable<-renderDataTable({
+    k=input$number_clusters
+    cls_result<-kmeans(newcountry1,k)
+    table2<-cls_result$centers
+    table2<-round(table2,0)
+    #create row names for "table2"
+    name_table2<-c()
+    for(i in 1:nrow(table2)){
+      name_table2<-c(name_table2,paste("cluster center",i,sep = " "))
+    }
+    rownames(table2)=name_table2
+    table2
+  })
 }
 
 
