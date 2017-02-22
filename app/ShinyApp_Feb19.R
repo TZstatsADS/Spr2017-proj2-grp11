@@ -166,22 +166,21 @@ ui<- navbarPage(
              ),
              ### end Motion Chart
              ### Tree Map
-             tabPanel("Tree map", sidebarLayout(
-               titlePanel("Tree map for certain year and commodity"),
-                        sidebarPanel=(
-                          selectInput(
-                            inputId = "com_tree",
-                            label  = "Choose the commodity",
-                            choices = c('Chocolate','Coffee','Cocoa','Spices','Tea'),
-                            selected ='Tea')),
-                          sliderInput(
-                            inputId = "year_tree",
-                            label = "Select a year",
-                            value = 1996, min =1996, max =2016)),
-                      mainPanel(
-                        plotOutput("treemap",height = 600, width = 600)
+             tabPanel("Tree Plot",
+                      titlePanel("Tree map for certain year and commodity"),
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput(inputId = "com_tree",
+                                      label  = "Select the commodity",
+                                      choices = c('Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                                      selected ='Coffee'),
+                          width = 3
+                        ),
+                        mainPanel(
+                          plotOutput("treemap",width = "100%", height = 600)
                         )
-                      ),
+                      )
+             ),
              ### end Tree Map
              ### Exchange Rate
              tabPanel("Exchange Rate", sidebarLayout(
@@ -429,7 +428,7 @@ server<- function(input, output){
   
   ## Tree Map
   output$treemap<-renderPlot({
-    country<-read.csv("country_cleaned.csv")
+    country<-read.csv("../data/country_cleaned.csv")
     #selcet a year and a one of the five categories
     sub_country<-country[country$Year==input$year_tree,]
     sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
