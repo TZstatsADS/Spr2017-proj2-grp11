@@ -177,7 +177,7 @@ ui<- navbarPage(
                                       label  = "Select the commodity",
                                       choices = c('Chocolate', 'Coffee','Cocoa','Spices','Tea'),
                                       selected ='Coffee'),
-                         sliderInput(
+                          sliderInput(
                             inputId = "year_tree",
                             label = "Select a year",
                             value = 1996, min =1996, max =2016)),
@@ -211,24 +211,24 @@ ui<- navbarPage(
              
              ### Mirror Histogram
              tabPanel("Mirror Histogram",
-              titlePanel("Trade Trend vs Exchange Rate"),
-              sidebarLayout(
-               sidebarPanel(
-                 selectInput(inputId = "commodity_hist",
-                             label  = "choose the commodity",
-                             choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                             selected ='Tea'),
-                 selectInput(inputId = "country_hist",
-                             label  = "choose the country",
-                             choices = unique(input_data$Country),
-                             selected ='Canada')
-               ),
-               
-               mainPanel(
-                 plotOutput("Hist")
-               )
-             )
-             
+                      titlePanel("Trade Trend vs Exchange Rate"),
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput(inputId = "commodity_hist",
+                                      label  = "Select the commodity",
+                                      choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                                      selected ='Tea'),
+                          selectInput(inputId = "country_hist",
+                                      label  = "Select the country",
+                                      choices = sort(unique(input_data$Country)),
+                                      selected ='Canada')
+                        ),
+                        
+                        mainPanel(
+                          plotOutput("Hist")
+                        )
+                      )
+                      
              ),
              ### end Mirror Histogram
              
@@ -288,7 +288,7 @@ ui<- navbarPage(
                dataTableOutput("mytable")
              )
            )
-  
+           
   ),
   ## end Clustering tab
   
@@ -407,7 +407,7 @@ server<- function(input, output){
     tmp = tmp[1:input$num_countries,]
     rank = 1:nrow(tmp)
     max = max(tmp$value, na.rm = TRUE)
-
+    
     Log = paste("level",floor(log((tmp$value) - min + 1, base =1.0001)/log(max - min + 1, base =1.0001) * 7 + 1),sep = "")
     tmp$rank = paste(tmp$Country,"<br/>",
                      "ranks No.",rank,"<br/>",
@@ -482,15 +482,23 @@ server<- function(input, output){
       Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
     )
     
-    ##plotting
     library(grid)
     plot1  = ggplot(dat, aes(x=Year, y=Value, fill=group))+
       geom_bar(stat="identity", position="identity")+
       scale_fill_manual(values=c("#87CEFA","#DC143C"))
-    plot2 = ggplot(Rate,aes(x = year,y = rate))+
-      geom_line(color = "Black")+
-      coord_cartesian(ylim=c(0, max(Rate$rate)))+
-      ylab("Exchange rate")
+    if(length(Rate$rate)){
+      plot2 = ggplot(Rate,aes(x = year,y = rate))+
+        geom_line(color = "Black")+
+        coord_cartesian(ylim=c(0, max(Rate$rate)))+
+        ylab("Exchange rate")
+    }
+    else if(length(Rate$rate) == 0){
+      empty <- data.frame(
+        year = 1996,
+        rate = 0)
+      plot2 = ggplot(empty,aes(x = year,y = rate))
+    }
+    
     plot1 <- plot1 + theme_bw() + theme(legend.position="top")
     plot2 <- plot2 + theme_bw() + theme(panel.grid=element_blank()) +
       theme(panel.background = element_rect(fill = NA))
@@ -562,7 +570,7 @@ server<- function(input, output){
         geo = g
       ) %>%
       hide_colorbar()
-     
+    
   })
   
   output$text_1<- renderText({
