@@ -70,6 +70,10 @@ input_data$log = ceiling(log(input_data$value)/3)-2
 input_data$value=as.numeric(input_data$value)
 #Load the data for Google motion data
 country<-read.csv("../data/country_cleaned.csv")
+# force all values in country dataset to be numeric
+for (i in 3:7){
+  country[,i]<-as.numeric(country[,i])
+}
 ## end preprocess data
 
 
@@ -432,11 +436,9 @@ server<- function(input, output){
   
   ## Tree Map
   output$treemap<-renderPlot({
-    country<-read.csv("../data/country_cleaned.csv")
     #selcet a year and a one of the five categories
     sub_country<-country[country$Year==input$year_tree,]
     sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
-    sub_country[,3]<-as.numeric( sub_country[,3])
     treemap(sub_country, index='Country', vSize=input$com_tree, vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
   })
   ## end Tree Map
