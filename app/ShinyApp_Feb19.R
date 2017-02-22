@@ -22,7 +22,8 @@ packages.used <-
     "googleVis",
     "dplyr",
     "plotly",
-    "RColorBrewer"
+    "RColorBrewer",
+    "treemap"
   )
 
 # check packages that need to be installed.
@@ -57,6 +58,7 @@ library("googleVis")
 library("plotly")
 library("grid")
 library("gtable")
+library("treemap")
 library("RColorBrewer")
 source("../lib/double-axis.R")
 ## preprocess work, Load dataframe already prepared for plotting
@@ -163,7 +165,24 @@ ui<- navbarPage(
                       )
              ),
              ### end Motion Chart
-             
+             ### Tree Map
+             tabPanel("Tree map", sidebarLayout(
+               titlePanel("Tree map for certain year and commodity"),
+                        sidebarPanel=(
+                          selectInput(
+                            inputId = "com_tree",
+                            label  = "Choose the commodity",
+                            choices = c('Chocolate','Coffee','Cocoa','Spices','Tea'),
+                            selected ='Tea')),
+                          sliderInput(
+                            inputId = "year_tree",
+                            label = "Select a year",
+                            value = 1996, min =1996, max =2016)),
+                      mainPanel(
+                        plotOutput("treemap",height = 600, width = 600)
+                        )
+                      ),
+             ### end Tree Map
              ### Exchange Rate
              tabPanel("Exchange Rate", sidebarLayout(
                sidebarPanel(
@@ -407,6 +426,17 @@ server<- function(input, output){
     gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee', options=list(width="800", height="800"))
   })
   ## end MotionChart
+  
+  ## Tree Map
+  output$treemap<-renderPlot({
+    country<-read.csv("country_cleaned.csv")
+    #selcet a year and a one of the five categories
+    sub_country<-country[country$Year==input$year_tree,]
+    sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
+    sub_country[,3]<-as.numeric( sub_country[,3])
+    treemap(sub_country, index='Country', vSize=input$com_tree, vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
+  })
+  ## end Tree Map
   
   ## exchange rate
   output$linear_exchange <-renderPlot({
