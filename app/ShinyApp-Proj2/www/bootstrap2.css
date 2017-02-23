@@ -36,6 +36,14 @@ html {
 
 body {
   margin: 0;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 16px;
+  line-height: 1.42857143;
+  color: #333333;
+  background-image: url("coffee2.gif");
+  background-repeat: repeat-y;
+  background-color: #ffffff;
+  background-attachment: fixed
 }
 article,
 aside,
@@ -1198,10 +1206,16 @@ h3,
 h4,
 h5,
 h6,
-.h1,
+.h1{
+  text-align: center;
+  letter-spacing: 3px;
+  },
 .h2,
 .h3,
-.h4,
+.h4{
+  text-align: center;
+  font-style: italic;
+  },
 .h5,
 .h6 {
   font-family: "Source Sans Pro", Calibri, Candara, Arial, sans-serif;
