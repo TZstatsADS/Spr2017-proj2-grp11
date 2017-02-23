@@ -1,5 +1,4 @@
 
-
 ## Packages
 
 packages.used <- 
@@ -24,8 +23,7 @@ packages.used <-
     "dplyr",
     "plotly",
     "RColorBrewer",
-    "treemap",
-    "gplots"
+    "treemap"
   )
 
 # check packages that need to be installed.
@@ -38,7 +36,6 @@ if(length(packages.needed)>0){
 }
 
 #load the packages
-library("gplots")
 library("plyr")
 library("dplyr")
 library("reshape2")
@@ -107,11 +104,8 @@ ui<- navbarPage(
   ## 3D Globe tab
   tabPanel("3D Globe",
            titlePanel("Coffee ,tea, and others traded between US and the world"),
-           absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                         draggable = TRUE, 
-                         top = 150, left = 20, right = "auto", bottom = "auto",
-                         width = 300, height = "auto",
-                         
+           sidebarLayout(
+             sidebarPanel(
                radioButtons(inputId = "type",
                             label  = "Choose import/export",
                             choices = c('Export','Import'),
@@ -125,17 +119,15 @@ ui<- navbarPage(
                selectInput(inputId = "commodity_3D",
                            label  = "Select the commodity",
                            choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                           selected ='Coffee')),
-           absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                         draggable = TRUE, 
-                         top = 200, left = "auto", right = 20, bottom = "auto",
-                         width = 330, height = "auto",
-                         
-                         plotOutput("ggplot",width="100%",height="200px")
-                         ),
-            
-              globeOutput("Globe",width="100%",height="600px"))
-           ,
+                           selected ='Coffee'),
+               width = 3
+             ),
+             mainPanel(
+               globeOutput("Globe",width="100%",height="600px"),
+               plotOutput("ggplot",width="100%",height="200px")
+             )
+           )
+  ),
   ## end 3D Globe tab
   
   ## 2D Map tab
@@ -226,22 +218,16 @@ ui<- navbarPage(
                                       label  = "Select the commodity",
                                       choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
                                       selected ='Tea'),
-                          selectInput(inputId = "country_hist1",
-                                      label  = "Select the country1",
-                                      choices = sort(unique(input_data$Country)),
-                                      selected ='Canada'),
-                          selectInput(inputId = "country_hist2",
-                                      label  = "Select the country2",
+                          selectInput(inputId = "country_hist",
+                                      label  = "Select the country",
                                       choices = sort(unique(input_data$Country)),
                                       selected ='Canada')
                         ),
                         
                         mainPanel(
-                          plotOutput("Hist1"),
-                          plotOutput("Hist2")
+                          plotOutput("Hist")
                         )
                       )
-                      
                       
              ),
              ### end Mirror Histogram
@@ -386,13 +372,8 @@ server<- function(input, output){
     clrs[temp$Country] = alpha(map_palette[1], log(temp$value)/maxValue*0.1)
     ##### end subset
     
-    g = ggplot(data = temp, aes(x = Country, y = value))+
-      geom_bar(stat='identity',position = "dodge")+
-               theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white")) +
-      theme(legend.position="none") + 
-      theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
-    g+
-      coord_flip()
+    g = ggplot(data = temp, aes(x = Country, y = value)) + theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white")) +theme(legend.position="none") + theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) + theme(panel.background = element_rect(fill = "#000000")) + theme(plot.background = element_rect(fill = "#000000")) + theme(panel.background = element_rect(colour = "#050505"))
+    g
     
   })
   ## end ggplot
@@ -443,8 +424,8 @@ server<- function(input, output){
       addMarkers(data = US, 
                  popup=~Country,icon = ~Icon)%>%  
       setView(lng=-30,lat=28,zoom=2)%>%#put US in the centre
-      addLegend("topright", colors = Colors, labels = Labels,
-                title = "Trade Level<br/>From Small to Large",
+      addLegend("bottomright", colors = Colors, labels = Labels,
+                title = "Value Level From Small to Large",
                 labFormat = labelFormat(prefix = "$"),
                 opacity = 1)
   })
@@ -463,13 +444,14 @@ server<- function(input, output){
   output$treemap<-renderPlot({
     #selcet a year and a one of the five categories
     sub_country<-country[country$Year==input$year_tree,]
+    sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
     sub_country[nrow(sub_country)+1,3:7]<-colSums(sub_country[,3:7])
     for(i in 3:7){
       sub_country[,i]<-sub_country[,i]/sub_country[nrow(sub_country),i]
     }
     sub_country<-sub_country[1:nrow(sub_country)-1,]
     sub_country$label<-paste(sub_country$Country,", ",round(100*sub_country[,as.character(input$com_tree)]),"%",sep="")
-    treemap(sub_country, index='label', vSize=input$com_tree, vColor="Country", type="categorical", palette="RdYlBu",aspRatio=30/30,drop.unused.levels = FALSE, position.legend="none")
+    treemap(sub_country, index='label', vSize=input$com_tree, vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
   })
   ## end Tree Map
   
@@ -478,87 +460,32 @@ server<- function(input, output){
     title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
     temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
                    import$Country == input$exchange_country)
-    dat = data.frame(rate = temp$rate,value = temp$value,year = temp$Year)
-    ggplot(dat, aes(x=rate, y=value)) +
-      geom_point(aes(colour = value)) + 
-      scale_colour_gradient(low = "blue")+
-      aes(size = value)+
-      ggtitle(title)+
-      theme(plot.title = element_text(lineheight=3, face="bold", color = "#666666", size=24,hjust = 1))+
-      xlab("Exchange rate")+
-      ylab("yearly import")+
-      theme(axis.title.y = element_text(color = "#666666",size = rel(1.8), angle = 0))+
-      theme(axis.title.x = element_text(color = "#666666",size = rel(1.8), angle = 0))+
-      geom_smooth(method=lm)
-#      +
-#    geom_text(aes(x=rate, y=value, label=year, fill=1))
+    plot(temp$rate,temp$value, main = title,
+         xlab="exchange rate", ylab="yearly import")
+    text(temp$rate, temp$value, temp$Year, cex=0.6, pos=4, col="red")
   })
   ##end exchange rate
   
   ## Mirror Histogram
-  #####First Histogram
-  output$Hist1 <- renderPlot({
+  output$Hist <- renderPlot({
     ##Subset
     tp = input_data
-    tp = subset(tp,Country == as.character(input$country_hist1))
+    tp = subset(tp,Country == as.character(input$country_hist))
     tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
     tp = tp[order(tp$type,decreasing = T),]#put import first
     Rate = exchange_rate
-    Rate = subset(Rate,Country.Name == as.character(input$country_hist1))
+    Rate = subset(Rate,Country.Name == as.character(input$country_hist))
     ##Data frame for ggplot2
-    dat1 <- data.frame(
+    dat <- data.frame(
       group = tp$type,
       Year = tp$Year,
       Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
     )
     
-    #### Plotting
-    plot1  = ggplot(dat1, aes(x=Year, y=Value, fill=group))+
+    library(grid)
+    plot1  = ggplot(dat, aes(x=Year, y=Value, fill=group))+
       geom_bar(stat="identity", position="identity")+
-      scale_fill_manual(values=c("#87CEFA","#DC143C"))+
-      coord_cartesian(xlim=c(1996, 2016))
-    if(length(Rate$rate)){
-      plot2 = ggplot(Rate,aes(x = year,y = rate))+
-        geom_line(color = "Black")+
-        coord_cartesian(ylim=c(0, max(Rate$rate)))+
-        ylab("Exchange rate")
-    }
-    else if(length(Rate$rate) == 0){
-      empty <- data.frame(
-        year = 1996,
-        rate = 0)
-      plot2 = ggplot(empty,aes(x = year,y = rate))
-    }
-    
-    plot1 <- plot1 + theme_bw() + theme(legend.position="top")
-    plot2 <- plot2 + theme_bw() + theme(panel.grid=element_blank()) +
-      theme(panel.background = element_rect(fill = NA))
-    #plot the exchange rate line on the histogram
-    #with 2 different y-axis
-    #use self-written function"double_axis_graph
-    plot(double_axis_graph(plot1,plot2))
-  })
-  
-  ######Second Histogram
-  output$Hist2 <- renderPlot({
-    ##Subset
-    tp = input_data
-    tp = subset(tp,Country == as.character(input$country_hist2))
-    tp = subset(tp,Commodity_Name == as.character(input$commodity_hist))
-    tp = tp[order(tp$type,decreasing = T),]#put import first
-    Rate = exchange_rate
-    Rate = subset(Rate,Country.Name == as.character(input$country_hist2))
-    ##Data frame for ggplot2
-    dat2 <- data.frame(
-      group = tp$type,
-      Year = tp$Year,
-      Value = ifelse(tp$type == "Import",tp$value,-tp$value)#import on upside, export on downside
-    )
-    ######## plotting
-    plot1  = ggplot(dat2, aes(x=Year, y=Value, fill=group))+
-      geom_bar(stat="identity", position="identity")+
-      scale_fill_manual(values=c("#87CEFA","#DC143C"))+
-      coord_cartesian(xlim=c(1996, 2016))
+      scale_fill_manual(values=c("#87CEFA","#DC143C"))
     if(length(Rate$rate)){
       plot2 = ggplot(Rate,aes(x = year,y = rate))+
         geom_line(color = "Black")+
@@ -604,7 +531,6 @@ server<- function(input, output){
     
     for (i in  unique (temp$Region)){
       temp_1 <- filter(temp , temp$Region ==i)
-      temp_1$value <- as.numeric(temp_1$value)
       temp_1 <- group_by(temp_1,Year)%>% summarise(value = sum(value))
       p <- add_trace(p, x = temp_1$Year, y = temp_1$value, mode = "lines+markers", name = i)
       
@@ -615,6 +541,7 @@ server<- function(input, output){
   
   ## Cluster visuals
   output$cluster <- renderPlotly({
+    set.seed(1)
     k = input$number_clusters
     newcountry<-country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
@@ -648,13 +575,14 @@ server<- function(input, output){
   })
   
   output$text_1<- renderText({
-    "Click on a Country to view cluster result" 
+    "Click on a state to view cluster result" 
   })
   output$text_2<- renderText({
-    "Trade Magnitude and number of countries in each cluster as follows:"
+    "Average and number of countries in each cluster as follows:"
   })
   
   output$mytable<-renderDataTable({
+    set.seed(1)
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
     #choose the five columns with different commodity values
@@ -663,20 +591,9 @@ server<- function(input, output){
     
     newcountry$cluster = cls_result$cluster
     by_clust = group_by(newcountry,cluster)
-    by_clust = as.data.frame(summarise(by_clust, 
-                                       mean(Coffee),
-                                       mean(Tea), 
-                                       mean(Spices), 
-                                       mean(Chocolate), 
-                                       mean(Cocoa)))
-    by_clust[,2:6] = t(apply(by_clust[,2:6],1,log))
-    names(by_clust) = c("by_clust","Magitude(Of Coffee)",
-                        "Magitude(Of Tea)",
-                        "Magitude(Of Spices)",
-                        "Magitude(Of Chocolate)",
-                        "Magitude(Of Cocoa)") 
+    by_clust = as.data.frame(summarise(by_clust, Magnitude_Coffee = log(mean(Coffee))-11 , Magnitude_Tea = log(mean(Tea))-11 , Magnitude_Spices = log(mean(Spices))-11 , Magnitude_Chocolate = log(mean(Chocolate))-11 , Magnitude_Cocoa = log(mean(Cocoa))-11 ))
     table2<-cbind(data.frame(Cluster = 1:k),data.frame(Size = cls_result$size),by_clust[,2:6])
-    table2<-round(table2,1)
+    table2<-round(table2,0.5)
     #create row names for "table2"
     name_table2<-c()
     for(i in 1:nrow(table2)){
