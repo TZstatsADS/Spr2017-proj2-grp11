@@ -1,0 +1,78 @@
+---
+title: "data.clean.BW"
+author: "Bowen Huang(bh2596)"
+date: "2/20/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+digit2<-read.csv('/users/bowen/desktop/Project 2/Secondlevelcleaned.csv',as.is = TRUE)
+#Sum the numbers each line from January to December
+m<-digit2[,5:16]+0
+digit2['Total']<-apply(m,1,sum)
+head(digit2)
+#(digit2[digit2$Country=="Cote d'Ivoire",])
+digit2<-digit2[,c(1,3,4,19)]
+head(digit2)
+digit2[,4]<-as.numeric(digit2[,4])
+digit2[digit2$Country=="Cote d'Ivoire",]
+#digit2[digit2$Country=="Cote d'Ivoire",]
+```
+
+```{r}
+digit2_list<-split(digit2, digit2$Country)
+country<-data.frame()
+for (i in 1:length(digit2_list)){
+  #create a dataframe for country i
+  data_i<-digit2_list[[i]]
+  data_i[,4]<-as.numeric(data_i[,4])
+  #get the data of 'coffee and coffee substitutes' or 'tea and mate' for country i
+  coffee<-data_i[data_i$sitc_sdesc=='COFFEE AND COFFEE SUBSTITUTES', ]
+  tea<-data_i[data_i$sitc_sdesc=='TEA AND MATE', ]
+  spices<-data_i[data_i$sitc_sdesc=='SPICES', ]
+  chocolate<-data_i[data_i$sitc_sdesc=="CHOCOLATE & OTHER FOOD PREPARATIONS CONTAINING CO", ]
+  cocoa<-data_i[data_i$sitc_sdesc=="COCOA", ]
+  coffee<-coffee[,c(1,3,4)]
+  colnames(coffee)[3]<-"coffee"
+  tea<-tea[,c(1,3,4)]
+  colnames(tea)[3]<-"tea"
+  cocoa<-cocoa[,c(1,3,4)]
+  colnames(cocoa)[3]<-"cocoa"
+  spices<-spices[,c(1,3,4)]
+  colnames(spices)[3]<-"spices"
+  chocolate<-chocolate[,c(1,3,4)]
+  colnames(chocolate)[3]<-"chocolate"
+  new<-merge(cocoa,tea,by=c("Country","Year"),all.x=T,all.y=T)
+  new<-merge(new,chocolate,by=c("Country","Year"),all.x=T,all.y=T)
+  new<-merge(new,spices,by=c("Country","Year"),all.x=T,all.y=T)
+  new<-merge(new,coffee,by=c("Country","Year"),all.x=T,all.y=T)
+  #new<-Reduce(function(x,y) merge(x,y,all=TRUE),list(coffee,tea,cocoa,chocolate,spices))
+  country<-rbind(country,new)
+}
+head(country)
+country[country$Country=="Cote d'Ivoire",]
+```
+
+```{r}
+colnames(country)
+colnames(country)[3:7]<-c('Cocoa','Tea','Chocolate','Spices','Coffee')
+country<-country[country$Country!='WorldTotal',]
+head(country)
+nrow(country)
+del_row<-c()
+country[is.na(country)]<-0
+for (i in 1:nrow(country)){
+  if (sum(country[i,3:7]==0)==5) {
+  del_row<-c(del_row,i)
+  }
+}
+country<-country[-del_row,]
+head(country)
+country[country$Country=="Cote d'Ivoire",]
+country[country$Country=="Afghanistan",]
+write.csv(country,"/Users/Bowen/Desktop/country_cleaned.csv",row.names = FALSE)
+```
