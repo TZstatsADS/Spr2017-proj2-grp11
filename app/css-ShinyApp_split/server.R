@@ -108,6 +108,18 @@ code = read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_w
 
 server<- function(input, output){
   
+  ##Introduction
+  output$blankspace = renderUI({
+    HTML("<br/><br/><br/><br/><br/><br/>")
+  })
+  output$text = renderUI({
+    HTML("<br/><br/>Our project looks into the trade of coffee, tea, chocolate, cocoa and spices<br/>
+         between the United States and the rest of the world<br/><br/><br/><br/>")
+  })
+  output$teammates = renderUI({
+    name = c("Our team:","Ruxue","Xiaowo","Raphael","Bowen","Terry")
+    HTML(paste(name,collapse = "<br/>"))
+  })
   ## 3D Globe
   output$Globe <- renderGlobe({
     ##### subset dataframe
