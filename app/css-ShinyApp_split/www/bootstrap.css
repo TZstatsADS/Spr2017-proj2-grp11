@@ -24,8 +24,9 @@ body {
   line-height: 1.42857143;
   color: #333333;
   background-image: url("coffee2.gif");
-  background-repeat: repeat-x;
+  background-repeat: repeat-y;
   background-color: #ffffff;
+  background-attachment: fixed
 }
 article,
 aside,
