@@ -113,7 +113,14 @@ ui<- navbarPage(
   theme = "bootstrap2.css",
   
   ##Project Title
-  "Flowing in and Flowing out",
+  "World Trade with US",
+
+  tabPanel("Home",
+           htmlOutput("blankspace"),
+           titlePanel("FINDING TRACE"),
+           h4(htmlOutput("text")),
+           htmlOutput("teammates")
+           ),
   
   ## 3D Globe tab
   tabPanel("3D Globe",
