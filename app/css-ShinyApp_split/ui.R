@@ -7,6 +7,7 @@ ui<- navbarPage(
   theme = "bootstrap.css",
   
   ##Project Title
+  "Finding Trace",
   tabPanel("Home",
            htmlOutput("blankspace"),
            titlePanel("FINDING TRACE"),
