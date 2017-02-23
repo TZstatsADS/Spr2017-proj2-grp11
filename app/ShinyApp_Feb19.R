@@ -463,14 +463,13 @@ server<- function(input, output){
   output$treemap<-renderPlot({
     #selcet a year and a one of the five categories
     sub_country<-country[country$Year==input$year_tree,]
-    sub_country<-data.frame(sub_country,y=1:nrow(sub_country))
     sub_country[nrow(sub_country)+1,3:7]<-colSums(sub_country[,3:7])
     for(i in 3:7){
       sub_country[,i]<-sub_country[,i]/sub_country[nrow(sub_country),i]
     }
     sub_country<-sub_country[1:nrow(sub_country)-1,]
     sub_country$label<-paste(sub_country$Country,", ",round(100*sub_country[,as.character(input$com_tree)]),"%",sep="")
-    treemap(sub_country, index='label', vSize=input$com_tree, vColor="y", type="index", palette="RdYlBu",aspRatio=30/30)
+    treemap(sub_country, index='label', vSize=input$com_tree, vColor="Country", type="categorical", palette="RdYlBu",aspRatio=30/30,drop.unused.levels = FALSE, position.legend="none")
   })
   ## end Tree Map
   
