@@ -91,6 +91,20 @@ import.without.aggregate$target <- as.character(import.without.aggregate$Commodi
 
 server<- function(input, output){
   
+   ##introduction text
+  output$blankspace <- renderUI({
+    str1 <- "<br/><br/><br/>"
+    HTML(str1)
+  })
+  output$text <- renderUI({
+    str1 <- "<br/><br/>Our Project aims to explore the trade in coffee, tea, chocolate, cocoa and spicies<br/>between the United States and the rest of the world.<br/><br/><br/><br/><br/><br/>"
+    HTML(str1)
+  })
+  output$teammates <- renderUI({
+    name <- c("Our Team:","Ruxue Peng","Xiaowo","Raphael","Bowen","Terry")
+    HTML(paste(name,"",sep = "<br/>",collapse = ""))
+  })
+ ## introduction end
   ## 3D Globe
   output$Globe <- renderGlobe({
     ##### subset dataframe
