@@ -93,7 +93,7 @@ import.without.aggregate$target <- as.character(import.without.aggregate$Commodi
 ## map creation preprocess
 data(wrld_simpl) # Basic country shapes
 bgcolor = "#000000"
-arc_colors = c("red","blue","green","#ffe9bf","pink","orange")
+arc_colors = c("#ffdbdb","#c4e0ff","#e8fff0","#ffe9bf","pink","orange")
 map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
