@@ -605,6 +605,7 @@ server<- function(input, output){
     
     for (i in  unique (temp$Region)){
       temp_1 <- filter(temp , temp$Region ==i)
+      temp_1$value <- as.numeric(temp_1$value)
       temp_1 <- group_by(temp_1,Year)%>% summarise(value = sum(value))
       p <- add_trace(p, x = temp_1$Year, y = temp_1$value, mode = "lines+markers", name = i)
       
