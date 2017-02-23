@@ -7,8 +7,12 @@ ui<- navbarPage(
   theme = "bootstrap.css",
   
   ##Project Title
-  "Flowing in and Flowing out",
-  
+  tabPanel("Home",
+           htmlOutput("blankspace"),
+           titlePanel("FINDING TRACE"),
+           h4(htmlOutput("text")),
+           htmlOutput("teammates")
+           ),
   ## 3D Globe tab
   tabPanel("3D Globe",
            titlePanel("Coffee ,tea, and others traded between US and the world"),
