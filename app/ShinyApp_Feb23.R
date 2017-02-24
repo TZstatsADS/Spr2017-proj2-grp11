@@ -648,13 +648,15 @@ server<- function(input, output){
   output$cluster <- renderPlotly({
     k = input$number_clusters
     newcountry<-country[country$Year==input$year_cluster,]
+    newcountry<-na.omit(newcountry)
     #choose the five columns with different commodity values
     newcountry1<-newcountry[,3:7]
+    #### modify for data
     #store the result of kmeans cluster in "cls_result"
     cls_result<-kmeans(newcountry1,k)
     clusters<-cls_result$cluster
     df = as.data.frame(clusters)
-    df$COUNTRY = newcountry[,2]
+    df$COUNTRY = newcountry[,1]
     df = merge(x = df, y = code, all.y = TRUE)
     df[is.na(df$clusters),2] = 0
     ## end cluster visual
@@ -668,13 +670,13 @@ server<- function(input, output){
     plot_geo(df) %>%
       add_trace(
         z = ~clusters, color = ~clusters, colors = brewer.pal(k, "RdYlGn"), type = "scatter", 
-        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l'), showlegend = FALSE
+        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l')
       ) %>%
+      colorbar(title = 'Cluster number', tickprefix = '') %>%
       layout(
         title = paste(k,"clusters for all countries concerning","Import",sep=" "),
         geo = g
-      ) %>%
-      hide_colorbar()
+      ) 
     
   })
   
@@ -688,12 +690,13 @@ server<- function(input, output){
   output$mytable<-renderDataTable({
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
+    newcountry<-na.omit(newcountry)
     #choose the five columns with different commodity values
     newcountry1<-newcountry[,3:7]
     cls_result<-kmeans(newcountry1,k)
     
-    newcountry$cluster = cls_result$cluster
-    by_clust = group_by(newcountry,cluster)
+    newcountry1$cluster = cls_result$cluster
+    by_clust = group_by(newcountry1,cluster)
     by_clust = as.data.frame(summarise(by_clust, 
                                        mean(Coffee),
                                        mean(Tea), 
