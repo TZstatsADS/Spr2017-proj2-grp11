@@ -10,7 +10,7 @@ Data Source: [data.gov](http://www.census.gov/foreign-trade/statistics/country/s
 ## Project Title Trace of Aroma - World Trade with U.S.
 Term: Spring 2017
 
-+ Team #
++ Team # Scent of Spirit
 + **Trace of Aroma - World Trade with U.S.**: + Team members
 	+ Ruxue Peng
 	+ Raphael Xiv
