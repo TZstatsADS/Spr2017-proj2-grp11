@@ -535,7 +535,7 @@ server<- function(input, output){
                         "Magitude(Of Spices)",
                         "Magitude(Of Chocolate)",
                         "Magitude(Of Cocoa)") 
-    table2<-cbind(data.frame(Cluster = 1:k),data.frame(Size = cls_result$size),by_clust[,2:6])
+    table2<-cbind(data.frame(Cluster = unique(cls_result$cluster)),data.frame(Size = cls_result$size),by_clust[,2:6])
     table2<-round(table2,1)
     #create row names for "table2"
     name_table2<-c()
@@ -543,6 +543,7 @@ server<- function(input, output){
       name_table2<-c(name_table2,paste("cluster means",i,sep = " "))
     }
     rownames(table2)=name_table2
+    table2<-table2[order(table2[,1]),]
     table2
   })
   }
