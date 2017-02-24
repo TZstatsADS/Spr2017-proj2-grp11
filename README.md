@@ -24,6 +24,9 @@ Term: Spring 2017
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
++ **Project demostration**: We have mainly four parts show on the web, "Home", "3D Globe", "2D Map", and "Summary Statistics", which are shown as follows. 
+![screenshot](https://cloud.githubusercontent.com/assets/25423915/23311757/3246d4a4-fa85-11e6-99f6-dbfb9519b6d5.png)
+
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
 ```
