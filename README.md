@@ -6,13 +6,14 @@
 
 In this second project of GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app on a topic of your choice using U.S. government open data released on the [data.gov](https://data.gov/) website. See [Project 2 Description](project2_desc.md) for more details.  
 
-*The above general statement about project 2 can be removed once you are finished with your project. It is optional.
+Our data is found from data.gov, the url of the website is [data.gov](http://www.census.gov/foreign-trade/statistics/country/sitc/index.html).
 
-## Project Title ??
+## Project Title 
+## Trace of Aroma - World Trade with U.S.
 Term: Spring 2017
 
 + Team #
-+ **Projec title**: + Team members
++ **Trace of Aroma - World Trade with U.S.**: + Team members
 	+ Ruxue Peng
 	+ Raphael Xiv
 	+ Xiaowo Sun
