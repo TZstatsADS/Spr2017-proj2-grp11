@@ -40,6 +40,17 @@ For the tab "Exchange rate", you can find on "Mirror Histogram" one country's im
 ![screenshot](https://cloud.githubusercontent.com/assets/25423915/23313482/e72b7b4e-fa8b-11e6-9580-b7d665e56953.png)
 ![screenshot](https://cloud.githubusercontent.com/assets/25423915/23311853/8c02345c-fa85-11e6-86bd-3a06cb1e2ab2.png)
 
+For the "Clustering Analysis" tab, you can find the clustering results for all countries concerning five commodities' import. This part is mainly for find the similaritis for tading commodities among various countries. The result are shown on the map as well as in the table. Different colors means different clusters, and the number of countries in each cluster and the average magnitude for different commodies are shown in each line of the tavble.
+![screenshot](https://cloud.githubusercontent.com/assets/25423915/23311861/941aeb7a-fa85-11e6-861e-e0022c413754.png)
+![screenshot](https://cloud.githubusercontent.com/assets/25423915/23311874/9dc5d950-fa85-11e6-9bf8-49d15465086a.png)
+
+The last part is "Motion Chart", in which you can see the dynamic change of two commodities for import concerning all countries. And if you choose the tab for line chart, the variation of one country/ several selected countries are also visualized.
+![screenshot](https://cloud.githubusercontent.com/assets/25423915/23311904/b9574e38-fa85-11e6-8dad-18ca1ff49cda.png)
+![screenshot](https://cloud.githubusercontent.com/assets/25423915/23311918/c13cf706-fa85-11e6-991d-842728323d21.png)
+
+The above demonstation are mainly what we built for this app. 
+
+
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
 ```
