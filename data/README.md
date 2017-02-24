@@ -7,7 +7,7 @@ sitc3digit-year.csv : data from [data.gov](http://www.census.gov/foreign-trade/s
 
 mydata.csv : can be generated using data_cleaning.R file in lib folder 
 
-mydata_wRegions.csv : is mydata.csv with 2 added columns, storing data of region types
+mydata_wRegions.csv : is mydata.csv with 2 added columns, storing data of region types. Can be generated using data.clean.BW.Rmd file in the lib folder  
 
 country_cleaned.csv : all the country and their export value to US in terms of the 5 commodities
 
