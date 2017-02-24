@@ -108,19 +108,16 @@ code = read.csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_w
 ## Server function
 
 server<- function(input, output){
-
+  
   ##Introduction
   output$blankspace = renderUI({
-    HTML("<br/><br/><br/><br/><br/><br/>")
+    HTML("<br/><br/><br/><br/><br/><br/><br/><br/>")
   })
   output$text = renderUI({
-    HTML("<br/><br/>Our project looks into the trade of coffee, tea, chocolate, cocoa and spices<br/>
-         between the United States and the rest of the world<br/><br/><br/><br/>")
+    HTML("<br/><br/><br/>Our project looks into the trade of coffee, tea, chocolate, cocoa and spices<br/>
+         between the United States and the rest of the world<br/><br/><br/><br/>Group 11: Ruxue, Xiaowo, Raphaël, Bowen, Terry")
   })
-  output$teammates = renderUI({
-    name = c("Our team:","Ruxue","Xiaowo","Raphael","Bowen","Terry")
-    HTML(paste(name,collapse = "<br/>"))
-  })
+
   
   ## 3D Globe
   output$Globe <- renderGlobe({
@@ -169,10 +166,10 @@ server<- function(input, output){
     
     ##### subset dataframe
     temp = input_data
-    temp = subset(temp,Commodity_Name == as.character(input$commodity_3D))
-    temp = subset(temp,Year == as.integer(input$year_3D))
+    temp = subset(temp,Commodity_Name == as.character(input$com_tree))
+    temp = subset(temp,Year == as.integer(input$year_tree))
     temp = subset(temp,type == as.character(input$type))
-    temp = arrange(temp,desc(value))[1:input$number_countries,]
+    temp = arrange(temp,desc(value))[1:input$number_countries_tree,]
     index = match(input$commodity_3D,c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'))
     maxValue = log(max(temp$value))
     map_palette = map_pal[,index]
@@ -185,7 +182,7 @@ server<- function(input, output){
       geom_bar(stat='identity',position = "dodge")+
       theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black")) +
       theme(legend.position="none") + 
-      theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#a7a7a7", high = "#dbdbdb") + scale_x_discrete(limits = temp$Country) 
+      theme(legend.background = element_rect(),panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) + geom_bar(stat = "identity", aes(fill=temp$value)) + scale_fill_gradient(low = "#c12a2a", high = "#c12a2a") + scale_x_discrete(limits = temp$Country) 
     g
     #print(g,vp = viewport(angle=-90))
     
@@ -250,7 +247,7 @@ server<- function(input, output){
   ## MotionChart
   output$view <- renderGvis({
     
-    gvisMotionChart(country, idvar='Country',timevar = 'Year', sizevar='Coffee',colorvar = 'Coffee', options=list(width="800", height="800"))
+    gvisMotionChart(country, xvar="Tea",yvar="Coffee",idvar='Country',timevar = 'Year', sizevar='Coffee',colorvar = 'Coffee', options=list(width="800", height="800"))
   })
   ## end MotionChart
   
@@ -300,11 +297,11 @@ server<- function(input, output){
   ##
   
   
-  ## exchange rate
-  output$linear_exchange <-renderPlot({
-    title <- paste(input$exchange_country, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
+  ## exchange rate1
+  output$linear_exchange1 <-renderPlot({
+    title <- paste(input$exchange_country1, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
     temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
-                   import$Country == input$exchange_country)
+                   import$Country == input$exchange_country1)
     dat = data.frame(rate = temp$rate,value = temp$value,year = temp$Year)
     ggplot(dat, aes(x=rate, y=value)) +
       geom_point(aes(colour = value)) + 
@@ -320,7 +317,30 @@ server<- function(input, output){
     #      +
     #    geom_text(aes(x=rate, y=value, label=year, fill=1))
   })
-  ##end exchange rate
+  ##end exchange rate1
+  
+  
+  ## exchange rate2
+  output$linear_exchange2 <-renderPlot({
+    title <- paste(input$exchange_country2, input$exchange_commodity, "import v.s. exchange rate",sep = " ")
+    temp <- filter(import,import$Commodity_Name== input$exchange_commodity,
+                   import$Country == input$exchange_country2)
+    dat = data.frame(rate = temp$rate,value = temp$value,year = temp$Year)
+    ggplot(dat, aes(x=rate, y=value)) +
+      geom_point(aes(colour = value)) + 
+      scale_colour_gradient(low = "blue")+
+      aes(size = value)+
+      ggtitle(title)+
+      theme(plot.title = element_text(lineheight=3, face="bold", color = "#666666", size=24,hjust = 1))+
+      xlab("Exchange rate")+
+      ylab("yearly import")+
+      theme(axis.title.y = element_text(color = "#666666",size = rel(1.8), angle = 0))+
+      theme(axis.title.x = element_text(color = "#666666",size = rel(1.8), angle = 0))+
+      geom_smooth(method=lm)
+    #      +
+    #    geom_text(aes(x=rate, y=value, label=year, fill=1))
+  })
+  ##end exchange rate2
   
   ## Mirror Histogram
   #####First Histogram
@@ -454,13 +474,15 @@ server<- function(input, output){
   output$cluster <- renderPlotly({
     k = input$number_clusters
     newcountry<-country[country$Year==input$year_cluster,]
+    newcountry<-na.omit(newcountry)
     #choose the five columns with different commodity values
     newcountry1<-newcountry[,3:7]
+    #### modify for data
     #store the result of kmeans cluster in "cls_result"
     cls_result<-kmeans(newcountry1,k)
     clusters<-cls_result$cluster
     df = as.data.frame(clusters)
-    df$COUNTRY = newcountry[,2]
+    df$COUNTRY = newcountry[,1]
     df = merge(x = df, y = code, all.y = TRUE)
     df[is.na(df$clusters),2] = 0
     ## end cluster visual
@@ -474,13 +496,13 @@ server<- function(input, output){
     plot_geo(df) %>%
       add_trace(
         z = ~clusters, color = ~clusters, colors = brewer.pal(k, "RdYlGn"), type = "scatter", 
-        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l'), showlegend = FALSE
+        text = ~COUNTRY, locations = ~CODE, marker = list(line = 'l')
       ) %>%
+      colorbar(title = 'Cluster number', tickprefix = '') %>%
       layout(
         title = paste(k,"clusters for all countries concerning","Import",sep=" "),
         geo = g
-      ) %>%
-      hide_colorbar()
+      ) 
     
   })
   
@@ -494,12 +516,13 @@ server<- function(input, output){
   output$mytable<-renderDataTable({
     k=input$number_clusters
     newcountry <- country[country$Year==input$year_cluster,]
+    newcountry<-na.omit(newcountry)
     #choose the five columns with different commodity values
     newcountry1<-newcountry[,3:7]
     cls_result<-kmeans(newcountry1,k)
     
-    newcountry$cluster = cls_result$cluster
-    by_clust = group_by(newcountry,cluster)
+    newcountry1$cluster = cls_result$cluster
+    by_clust = group_by(newcountry1,cluster)
     by_clust = as.data.frame(summarise(by_clust, 
                                        mean(Coffee),
                                        mean(Tea), 
@@ -522,4 +545,4 @@ server<- function(input, output){
     rownames(table2)=name_table2
     table2
   })
-}
+  }

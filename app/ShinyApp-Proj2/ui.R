@@ -94,7 +94,7 @@ import.without.aggregate$target <- as.character(import.without.aggregate$Commodi
 data(wrld_simpl) # Basic country shapes
 bgcolor = "#000000"
 arc_colors = c("#ffdbdb","#c4e0ff","#e8fff0","#ffe9bf","pink","orange")
-map_pal = data.frame(AnnualAggregate = c("red"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
+map_pal = data.frame(AnnualAggregate = c("#ff6d6d"),Chocolate = c("blue"),Coffee = c("green"),COCOA = c("#ffe9bf"),Spices = c("pink"),Tea = c("orange"))
 names(map_pal)[1] = "Annual Aggregate"
 ## end preprocess map
 
@@ -113,11 +113,11 @@ ui<- navbarPage(
   theme = "bootstrap2.css",
   
   ##Project Title
-  "World Trade with US",
+  "TRACE OF AROMA - World Trade with US",
 
   tabPanel("Home",
            htmlOutput("blankspace"),
-           titlePanel("FINDING TRACE"),
+           titlePanel("TRACE OF AROMA"),
            h4(htmlOutput("text")),
            htmlOutput("teammates")
            ),
@@ -127,7 +127,7 @@ ui<- navbarPage(
            titlePanel("Coffee ,tea, and others traded between US and the world"),
            absolutePanel(id = "controls", class = "panel panel-default",
                          draggable = TRUE, 
-                         top = 180, left = "auto", right = 60, bottom = "auto",
+                         top = 180, left = 60, right = "auto", bottom = "auto",
                          width = 350, height = "auto",
                          
                          h2("3D Explorer"),
@@ -138,7 +138,7 @@ ui<- navbarPage(
                                       selected ='Import'),
                          sliderInput(inputId = "year_3D",
                                      label = "Select a year",
-                                     value = 2016, min =1996, max =2016),
+                                     value = 1996, min =1996, max =2016),
                          sliderInput(inputId = "number_countries",
                                      label = "Top Countries in Trade",
                                      value = 10,min = 1,max = 50),
@@ -148,12 +148,6 @@ ui<- navbarPage(
                                      selected ='Coffee')
                          ),
            
-           absolutePanel(id = "controls", class = "panel panel-default",
-                         draggable = TRUE, 
-                         top = "auto", left = 60, right = "auto", bottom = 20,
-                         width = 500 , height = 200,
-                         
-                         plotOutput("ggplot",width="100%",height="200px")),
            
            
            globeOutput("Globe",width="100%",height="650px")),
@@ -195,13 +189,7 @@ ui<- navbarPage(
   ## Summary Statistics tab
   navbarMenu("Summary Statistics",
              
-             ### Motion Chart
-             tabPanel("Motion Chart",
-                      mainPanel(
-                        htmlOutput("view")
-                      )
-             ),
-             ### end Motion Chart
+             
              
              ##Regional Findings tabset
              tabPanel("Regional Findings",
@@ -224,8 +212,9 @@ ui<- navbarPage(
                                    ),
                                    
                                    mainPanel(
-                                     plotOutput("continent_import", height = "330px"),
-                                     plotlyOutput("regional_import",height = "420px")
+                                     plotlyOutput("regional_import",height = "420px"),
+                                     plotOutput("continent_import", height = "330px")
+                                     
                                    )
                                    
                                  )
@@ -244,12 +233,21 @@ ui<- navbarPage(
                                        inputId = "year_tree",
                                        label = "Select a year",
                                        value = 2016, min =1996, max =2016),
+                                     sliderInput(inputId = "number_countries_tree",
+                                                 label = "Top Countries in Trade",
+                                                 value = 10,min = 1,max = 20),
                                      
                                      width = 3
                                    ),
                                    
                                    mainPanel(
-                                     plotOutput("treemap",width = "100%", height = 600)
+                                     plotOutput("treemap",width = "100%", height = 600),
+                                     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                                   draggable = TRUE, 
+                                                   top = 600, left = 20, right = "auto", bottom = "auto",
+                                                   width = 350, height = "auto",
+                                     plotOutput("ggplot",width="100%",height="250px")
+                                     )
                                    )
                                  )
                         )
@@ -257,10 +255,78 @@ ui<- navbarPage(
                         
                       )
              ),
-             #end Regional
+             #end Regiona
+             
+             ### Exchange Rate
+             tabPanel("Exchange Rate", 
+                      tabsetPanel(
+                        
+                        ### end Exchange Rate
+                        
+                        ### Mirror Histogram
+                        tabPanel("Mirror Histogram",
+                                 titlePanel("Trade Import and Export vs Exchange Rate"),
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     selectInput(inputId = "commodity_hist",
+                                                 label  = "Select the commodity",
+                                                 choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
+                                                 selected ='Coffee'),
+                                     selectInput(inputId = "country_hist1",
+                                                 label  = "Select the country1",
+                                                 choices = sort(unique(input_data$Country)),
+                                                 selected ='Brazil'),
+                                     selectInput(inputId = "country_hist2",
+                                                 label  = "Select the country2",
+                                                 choices = sort(unique(input_data$Country)),
+                                                 selected ='Colombia'),
+                                     width = 3
+                                     
+                                   ),
+                                   
+                                   mainPanel(
+                                     plotOutput("Hist1"),
+                                     plotOutput("Hist2")
+                                   )
+                                 )
+                                 
+                                 
+                        ),
+                        
+                        tabPanel("Regression",
+                                 titlePanel("Relationship between Import and Exchange Rate"),
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     selectInput(inputId = "exchange_commodity",
+                                                 label  = "choose the commodity",
+                                                 choices = unique(import$Commodity_Name),
+                                                 selected ='Coffee'),
+                                     selectInput(inputId = "exchange_country1",
+                                                 label  = "choose the country",
+                                                 choices = unique(import$Country),
+                                                 selected ='Brazil'),
+                                     selectInput(inputId = "exchange_country2",
+                                                 label  = "choose the country",
+                                                 choices = unique(import$Country),
+                                                 selected ='Colombia'),
+                                     width = 3
+                                     
+                                   ),
+                                   
+                                   mainPanel(
+                                     plotOutput("linear_exchange1"),
+                                     plotOutput("linear_exchange2")
+                                   )
+                                 )
+                                 
+                        )
+                        ### end Mirror Histogram
+                      )
+                      
+                      
+             ),
              
              ## Clustering tab
-             
              tabPanel("Clustering Analysis",
                       titlePanel("Clustering Analysis"),
                       sidebarLayout(
@@ -287,70 +353,13 @@ ui<- navbarPage(
              ),
              ## end Clustering tab
              
-             
-             ### Exchange Rate
-             tabPanel("Exchange Rate", 
-                      tabsetPanel(
-                        
-                        ### end Exchange Rate
-                        
-                        ### Mirror Histogram
-                        tabPanel("Mirror Histogram",
-                                 titlePanel("Trade Trend vs Exchange Rate"),
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput(inputId = "commodity_hist",
-                                                 label  = "Select the commodity",
-                                                 choices = c('Annual Aggregate','Chocolate', 'Coffee','Cocoa','Spices','Tea'),
-                                                 selected ='Tea'),
-                                     selectInput(inputId = "country_hist1",
-                                                 label  = "Select the country1",
-                                                 choices = sort(unique(input_data$Country)),
-                                                 selected ='Canada'),
-                                     selectInput(inputId = "country_hist2",
-                                                 label  = "Select the country2",
-                                                 choices = sort(unique(input_data$Country)),
-                                                 selected ='China'),
-                                     width = 3
-                                     
-                                   ),
-                                   
-                                   mainPanel(
-                                     plotOutput("Hist1"),
-                                     plotOutput("Hist2")
-                                   )
-                                 )
-                                 
-                                 
-                        ),
-                        
-                        tabPanel("Regression",
-                                 titlePanel("Regression of Import and Exchange Rate"),
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput(inputId = "exchange_commodity",
-                                                 label  = "choose the commodity",
-                                                 choices = unique(import$Commodity_Name),
-                                                 selected ='Spices'),
-                                     selectInput(inputId = "exchange_country",
-                                                 label  = "choose the country",
-                                                 choices = unique(import$Country),
-                                                 selected ='China'),
-                                     width = 3
-                                     
-                                   ),
-                                   
-                                   mainPanel(
-                                     plotOutput("linear_exchange")
-                                   )
-                                 )
-                                 
-                        )
-                        ### end Mirror Histogram
-                        
-                        
+             ### Motion Chart
+             tabPanel("Motion Chart",
+                      mainPanel(
+                        htmlOutput("view")
                       )
              )
+             ### end Motion Chart
              ## end Summary Statistics tab
              
   )
