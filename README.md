@@ -5,6 +5,8 @@
 
 In this second project of GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app on US international trade using U.S. government open data released on the [data.gov](https://data.gov/) website. See [Project 2 Description](project2_desc.md) for more details.  
 
+The app is available here: https://prayerest.shinyapps.io/ShinyApp-Proj2/
+
 Data Source: [data.gov](http://www.census.gov/foreign-trade/statistics/country/sitc/index.html).
 
 ## Project Title Trace of Aroma - World Trade with U.S.
